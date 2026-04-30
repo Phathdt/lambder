@@ -1,61 +1,36 @@
 import { isErr, isOk } from '@lambder/shared-kernel';
 import { describe, expect, test } from 'vitest';
-import { SignupService } from '../src/application/services/signup.service.js';
-import type { Hasher } from '../src/domain/interfaces/hasher.js';
-import type { UserRepository } from '../src/domain/interfaces/user.repository.js';
-
-const fakeHasher: Hasher = {
-  async hash(p) {
-    return `hash(${p})`;
-  },
-  async verify(p, h) {
-    return h === `hash(${p})`;
-  },
-};
-
-const makeFakeRepo = (): UserRepository & { _users: Map<string, any> } => {
-  const _users = new Map<string, any>();
-  return {
-    _users,
-    async findByEmail(email) {
-      return _users.get(email.toLowerCase()) ?? null;
-    },
-    async findByEmailWithHash(email) {
-      return _users.get(email.toLowerCase()) ?? null;
-    },
-    async findById(id) {
-      for (const u of _users.values()) if (u.id === id) return u;
-      return null;
-    },
-    async create(input) {
-      const u = {
-        id: crypto.randomUUID(),
-        email: input.email,
-        passwordHash: input.passwordHash,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-      _users.set(input.email.toLowerCase(), u);
-      return u;
-    },
-  };
-};
+import { SignupService } from '../src/application/services/signup.service';
+import { createFakeHasher, createFakeUserRepository } from './fakes';
 
 describe('SignupService', () => {
-  test('creates a new user', async () => {
-    const repo = makeFakeRepo();
-    const svc = new SignupService(repo, fakeHasher);
+  test('creates a new user and returns public DTO', async () => {
+    const repo = createFakeUserRepository();
+    const svc = new SignupService(repo, createFakeHasher());
     const result = await svc.execute({ email: 'A@B.com', password: 'StrongPass1!' });
     expect(isOk(result)).toBe(true);
-    if (isOk(result)) expect(result.value.email).toBe('a@b.com');
+    if (isOk(result)) {
+      expect(result.value.email).toBe('a@b.com');
+      expect(result.value.id).toMatch(/^[0-9a-f-]{36}$/i);
+    }
   });
 
   test('rejects duplicate email (case-insensitive)', async () => {
-    const repo = makeFakeRepo();
-    const svc = new SignupService(repo, fakeHasher);
-    await svc.execute({ email: 'a@b.com', password: 'x' });
-    const result = await svc.execute({ email: 'A@B.com', password: 'y' });
+    const repo = createFakeUserRepository();
+    const svc = new SignupService(repo, createFakeHasher());
+    await svc.execute({ email: 'a@b.com', password: 'StrongPass1!' });
+    const result = await svc.execute({ email: 'A@B.com', password: 'AnotherPass2!' });
     expect(isErr(result)).toBe(true);
     if (isErr(result)) expect(result.error.code).toBe('EMAIL_TAKEN');
+  });
+
+  test('persists the hasher output, not raw input', async () => {
+    const repo = createFakeUserRepository();
+    const svc = new SignupService(repo, createFakeHasher());
+    await svc.execute({ email: 'x@y.com', password: 'StrongPass1!' });
+    const stored = repo.users.get('x@y.com');
+    // Fake hasher wraps the plain text — contract is that the service routes
+    // through the hasher, not that the fake produces a secure digest.
+    expect(stored?.passwordHash).toBe('hash(StrongPass1!)');
   });
 });

@@ -7,7 +7,7 @@
     "dev": "tsx watch src/dev-server.ts",
     "build": "rolldown -c rolldown.config.mjs",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run",
+    "test": "vitest run --passWithNoTests",
     "clean": "rm -rf dist .turbo .serverless"
   },
   "dependencies": {

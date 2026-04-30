@@ -11,7 +11,7 @@ export default defineConfig({
   out: './migrations',
   dialect: 'postgresql',
   dbCredentials: {
-    url: process.env.DATABASE_URL ?? 'postgres://lambder:lambder@localhost:5433/lambder',
+    url: process.env.DATABASE_URL ?? 'postgres://lambder:lambder@localhost:5432/lambder',
   },
   strict: true,
   verbose: true,
