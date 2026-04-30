@@ -1,4 +1,8 @@
 {
   "extends": "@lambder/tsconfig/lib.json",
-  "include": ["src/**/*"]
+  "include": ["src/**/*"],
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "../../dist/packages/cache"
+  }
 }

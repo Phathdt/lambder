@@ -1,13 +1,15 @@
 import { drizzle, type NodePgDatabase } from 'drizzle-orm/node-postgres';
 import pg from 'pg';
-import * as schema from './schema.js';
 
 declare global {
   // eslint-disable-next-line no-var
   var _pgPool: pg.Pool | undefined;
 }
 
-export type Database = NodePgDatabase<typeof schema>;
+// Untyped schema — feature packages own their own table definitions and pass
+// them locally to drizzle queries. This keeps @lambder/db decoupled from
+// @lambder/auth and @lambder/products (no circular deps).
+export type Database = NodePgDatabase;
 
 export const getPool = (databaseUrl: string): pg.Pool => {
   if (!globalThis._pgPool) {
@@ -21,5 +23,4 @@ export const getPool = (databaseUrl: string): pg.Pool => {
   return globalThis._pgPool;
 };
 
-export const getDb = (databaseUrl: string): Database =>
-  drizzle(getPool(databaseUrl), { schema });
+export const getDb = (databaseUrl: string): Database => drizzle(getPool(databaseUrl));

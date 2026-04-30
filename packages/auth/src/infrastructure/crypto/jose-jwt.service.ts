@@ -1,6 +1,6 @@
 import { SignJWT, importPKCS8, importSPKI, jwtVerify, type KeyLike } from 'jose';
 import { randomUUID } from 'node:crypto';
-import type { JwtClaims, JwtKind, JwtService, SignedToken } from '../../domain/interfaces/jwt-service.js';
+import type { JwtClaims, JwtKind, JwtService, SignedToken } from '../../domain/interfaces/jwt-service';
 
 const ALG = 'EdDSA';
 
@@ -41,11 +41,10 @@ export class JoseJwtService implements JwtService {
 
   async verify(token: string): Promise<JwtClaims> {
     const { pub } = await this.keys();
-    const { payload } = await jwtVerify(token, pub, {
-      algorithms: [ALG],
-      issuer: this.config.issuer,
-      audience: this.config.audience,
-    });
+    const opts: Parameters<typeof jwtVerify>[2] = { algorithms: [ALG] };
+    if (this.config.issuer) opts.issuer = this.config.issuer;
+    if (this.config.audience) opts.audience = this.config.audience;
+    const { payload } = await jwtVerify(token, pub, opts);
     if (!payload.sub || !payload.jti || !payload.iat || !payload.exp) {
       throw new Error('Malformed token claims');
     }

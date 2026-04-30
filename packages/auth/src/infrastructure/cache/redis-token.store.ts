@@ -1,5 +1,5 @@
 import type { Redis } from '@lambder/cache';
-import type { TokenStore } from '../../domain/interfaces/token-store.js';
+import type { TokenStore } from '../../domain/interfaces/token-store';
 
 const wlKey = (userId: string, jti: string) => `jwt:wl:${userId}:${jti}`;
 const wlPattern = (userId: string) => `jwt:wl:${userId}:*`;

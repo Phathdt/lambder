@@ -2,9 +2,9 @@ import { getRedis } from '@lambder/cache';
 import { JoseJwtService, RedisTokenStore } from '@lambder/auth';
 import { buildProductsModule } from '@lambder/products/module';
 import { Hono } from 'hono';
-import { loadConfig } from './config.js';
-import { errorMapper } from './middleware/error-mapper.js';
-import { productsRoute } from './routes/products.route.js';
+import { loadConfig } from './config';
+import { errorMapper } from './middleware/error-mapper';
+import { productsRoute } from './routes/products.route';
 
 export const buildProductsApp = () => {
   const env = loadConfig();

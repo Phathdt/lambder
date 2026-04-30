@@ -1,8 +1,8 @@
 import { type Result, err, ok, type ConflictError } from '@lambder/shared-kernel';
-import type { Hasher } from '../../domain/interfaces/hasher.js';
-import type { UserRepository } from '../../domain/interfaces/user.repository.js';
-import { toPublicUser } from '../../domain/entities/user.entity.js';
-import { emailTaken } from '../../domain/errors.js';
+import type { Hasher } from '../../domain/interfaces/hasher';
+import type { UserRepository } from '../../domain/interfaces/user.repository';
+import { toPublicUser } from '../../domain/entities/user.entity';
+import { emailTaken } from '../../domain/errors';
 
 export interface SignupInput {
   email: string;

@@ -1,8 +1,8 @@
 import type { Database } from '@lambder/db';
 import { sql } from 'drizzle-orm';
-import type { NewUser, User, UserWithHash } from '../../domain/entities/user.entity.js';
-import type { UserRepository } from '../../domain/interfaces/user.repository.js';
-import { users, type UserRow } from '../db/auth.schema.js';
+import type { NewUser, User, UserWithHash } from '../../domain/entities/user.entity';
+import type { UserRepository } from '../../domain/interfaces/user.repository';
+import { users, type UserRow } from '../db/auth.schema';
 
 const toUser = (row: UserRow): User => ({
   id: row.id,

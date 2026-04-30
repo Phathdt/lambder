@@ -4,8 +4,8 @@ import type { ProductsModule } from '@lambder/products';
 import { toProductDto } from '@lambder/products';
 import { isErr } from '@lambder/shared-kernel';
 import { Hono } from 'hono';
-import { mapError } from '../middleware/error-mapper.js';
-import { jwtAuth } from '../middleware/jwt-auth.js';
+import { mapError } from '../middleware/error-mapper';
+import { jwtAuth } from '../middleware/jwt-auth';
 
 export interface ProductsRouteDeps {
   products: ProductsModule;

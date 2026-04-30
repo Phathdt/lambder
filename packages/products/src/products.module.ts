@@ -1,6 +1,6 @@
 import { getDb } from '@lambder/db';
-import { ProductService } from './application/services/product.service.js';
-import { ProductDrizzleRepository } from './infrastructure/repositories/product.drizzle-repository.js';
+import { ProductService } from './application/services/product.service';
+import { ProductDrizzleRepository } from './infrastructure/repositories/product.drizzle-repository';
 
 export interface ProductsModuleConfig {
   databaseUrl: string;

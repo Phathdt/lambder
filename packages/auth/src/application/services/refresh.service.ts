@@ -1,7 +1,7 @@
 import { type AuthError, type Result, err, ok } from '@lambder/shared-kernel';
-import type { JwtService } from '../../domain/interfaces/jwt-service.js';
-import type { TokenStore } from '../../domain/interfaces/token-store.js';
-import { invalidToken, tokenReused } from '../../domain/errors.js';
+import type { JwtService } from '../../domain/interfaces/jwt-service';
+import type { TokenStore } from '../../domain/interfaces/token-store';
+import { invalidToken, tokenReused } from '../../domain/errors';
 
 export interface RefreshInput {
   refreshToken: string;

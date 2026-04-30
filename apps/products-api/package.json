@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/dev-server.ts",
-    "build": "rolldown -c rolldown.config.ts",
+    "build": "rolldown -c rolldown.config.mjs",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "clean": "rm -rf dist .turbo .serverless"
@@ -15,9 +15,15 @@
     "@lambder/auth": "workspace:*",
     "@lambder/cache": "workspace:*",
     "@lambder/contracts": "workspace:*",
+    "@lambder/db": "workspace:*",
     "@lambder/products": "workspace:*",
     "@lambder/shared-kernel": "workspace:*",
+    "dotenv": "^17.4.2",
+    "drizzle-orm": "^0.36.0",
     "hono": "^4.6.0",
+    "ioredis": "^5.4.0",
+    "jose": "^5.9.0",
+    "pg": "^8.13.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {

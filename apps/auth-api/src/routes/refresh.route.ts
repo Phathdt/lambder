@@ -2,7 +2,7 @@ import type { AuthModule } from '@lambder/auth';
 import { refreshBody } from '@lambder/contracts';
 import { isErr } from '@lambder/shared-kernel';
 import { Hono } from 'hono';
-import { mapError } from '../middleware/error-mapper.js';
+import { mapError } from '../middleware/error-mapper';
 
 export const refreshRoute = (auth: AuthModule) => {
   const app = new Hono();

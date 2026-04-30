@@ -1,14 +1,14 @@
 import { getRedis } from '@lambder/cache';
 import { getDb } from '@lambder/db';
-import { LoginService } from './application/services/login.service.js';
-import { LogoutService } from './application/services/logout.service.js';
-import { RefreshService } from './application/services/refresh.service.js';
-import { SignupService } from './application/services/signup.service.js';
-import { Argon2Hasher } from './infrastructure/crypto/argon2.hasher.js';
-import { JoseJwtService } from './infrastructure/crypto/jose-jwt.service.js';
-import { RedisTokenStore } from './infrastructure/cache/redis-token.store.js';
-import { UserDrizzleRepository } from './infrastructure/repositories/user.drizzle-repository.js';
-import type { JwtService } from './domain/interfaces/jwt-service.js';
+import { LoginService } from './application/services/login.service';
+import { LogoutService } from './application/services/logout.service';
+import { RefreshService } from './application/services/refresh.service';
+import { SignupService } from './application/services/signup.service';
+import { Argon2Hasher } from './infrastructure/crypto/argon2.hasher';
+import { JoseJwtService } from './infrastructure/crypto/jose-jwt.service';
+import { RedisTokenStore } from './infrastructure/cache/redis-token.store';
+import { UserDrizzleRepository } from './infrastructure/repositories/user.drizzle-repository';
+import type { JwtService } from './domain/interfaces/jwt-service';
 
 export interface AuthModuleConfig {
   databaseUrl: string;

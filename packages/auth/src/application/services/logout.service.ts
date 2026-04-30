@@ -1,4 +1,4 @@
-import type { TokenStore } from '../../domain/interfaces/token-store.js';
+import type { TokenStore } from '../../domain/interfaces/token-store';
 
 export interface LogoutInput {
   userId: string;

@@ -1,3 +1,3 @@
-export * from './result.js';
-export * from './errors.js';
-export * from './clock.js';
+export * from './result';
+export * from './errors';
+export * from './clock';

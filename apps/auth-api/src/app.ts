@@ -1,11 +1,11 @@
 import { buildAuthModule, type AuthModule } from '@lambder/auth/module';
 import { Hono } from 'hono';
-import { loadConfig } from './config.js';
-import { errorMapper } from './middleware/error-mapper.js';
-import { loginRoute } from './routes/login.route.js';
-import { logoutRoute } from './routes/logout.route.js';
-import { refreshRoute } from './routes/refresh.route.js';
-import { signupRoute } from './routes/signup.route.js';
+import { loadConfig } from './config';
+import { errorMapper } from './middleware/error-mapper';
+import { loginRoute } from './routes/login.route';
+import { logoutRoute } from './routes/logout.route';
+import { refreshRoute } from './routes/refresh.route';
+import { signupRoute } from './routes/signup.route';
 
 export const buildAuthApp = (auth?: AuthModule) => {
   const module =

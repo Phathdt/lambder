@@ -9,9 +9,9 @@ import {
   decimalToCents,
   type Product,
   type ProductPatch,
-} from '../../domain/entities/product.entity.js';
-import type { ProductPage, ProductRepository } from '../../domain/interfaces/product.repository.js';
-import { productForbidden, productNotFound } from '../../domain/errors.js';
+} from '../../domain/entities/product.entity';
+import type { ProductPage, ProductRepository } from '../../domain/interfaces/product.repository';
+import { productForbidden, productNotFound } from '../../domain/errors';
 
 export interface CreateProductInput {
   ownerId: string;
@@ -68,12 +68,12 @@ export class ProductService {
     if (!existing) return err(productNotFound());
     if (existing.ownerId !== input.actorId) return err(productForbidden());
 
-    const patch: ProductPatch = {};
+    const patch: { name?: string; description?: string | null; priceCents?: number } = {};
     if (input.patch.name !== undefined) patch.name = input.patch.name;
     if (input.patch.description !== undefined) patch.description = input.patch.description ?? null;
     if (input.patch.price !== undefined) patch.priceCents = decimalToCents(input.patch.price);
 
-    return ok(await this.products.update(input.id, patch));
+    return ok(await this.products.update(input.id, patch as ProductPatch));
   }
 
   async delete(input: DeleteProductInput): Promise<Result<true, NotFoundError | ForbiddenError>> {

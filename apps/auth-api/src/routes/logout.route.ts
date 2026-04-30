@@ -1,6 +1,6 @@
 import type { AuthModule } from '@lambder/auth';
 import { Hono } from 'hono';
-import { jwtAuth } from '../middleware/jwt-auth.js';
+import { jwtAuth } from '../middleware/jwt-auth';
 
 export const logoutRoute = (auth: AuthModule) => {
   const app = new Hono();

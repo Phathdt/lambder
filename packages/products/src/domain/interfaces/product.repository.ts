@@ -1,4 +1,4 @@
-import type { NewProduct, Product, ProductPatch } from '../entities/product.entity.js';
+import type { NewProduct, Product, ProductPatch } from '../entities/product.entity';
 
 export interface ProductPage {
   readonly items: Product[];

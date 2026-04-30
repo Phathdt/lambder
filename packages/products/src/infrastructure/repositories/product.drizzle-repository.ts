@@ -1,8 +1,8 @@
 import type { Database } from '@lambder/db';
 import { sql } from 'drizzle-orm';
-import type { NewProduct, Product, ProductPatch } from '../../domain/entities/product.entity.js';
-import type { ProductPage, ProductRepository } from '../../domain/interfaces/product.repository.js';
-import { products, type ProductRow } from '../db/products.schema.js';
+import type { NewProduct, Product, ProductPatch } from '../../domain/entities/product.entity';
+import type { ProductPage, ProductRepository } from '../../domain/interfaces/product.repository';
+import { products, type ProductRow } from '../db/products.schema';
 
 const toProduct = (row: ProductRow): Product => ({
   id: row.id,
