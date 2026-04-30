@@ -1,0 +1,5 @@
+services:
+  auth-api:
+    path: apps/auth-api
+  products-api:
+    path: apps/products-api

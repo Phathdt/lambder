@@ -1,0 +1,7 @@
+node_modules
+dist
+.turbo
+.serverless
+coverage
+**/migrations/**
+pnpm-lock.yaml

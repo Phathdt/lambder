@@ -1,0 +1,11 @@
+**/node_modules
+**/dist
+**/.turbo
+**/.serverless
+**/coverage
+**/.env
+**/.env.*.local
+.git
+.claude_sessions
+plans
+docs

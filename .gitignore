@@ -1,0 +1,15 @@
+node_modules
+dist
+.turbo
+.serverless
+coverage
+.env
+.env.*.local
+.claude_sessions
+.DS_Store
+*.log
+*.tsbuildinfo
+.idea
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json

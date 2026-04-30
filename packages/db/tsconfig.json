@@ -1,0 +1,4 @@
+{
+  "extends": "@lambder/tsconfig/lib.json",
+  "include": ["src/**/*", "scripts/**/*", "drizzle.config.ts"]
+}

@@ -1,0 +1,65 @@
+name: lambder-dev
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: lambder-postgres
+    ports:
+      - "127.0.0.1:5432:5432"
+    environment:
+      POSTGRES_DB: lambder
+      POSTGRES_USER: lambder
+      POSTGRES_PASSWORD: lambder
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lambder -d lambder"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: lambder-redis
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - redis_data:/data
+    command: ["redis-server", "--appendonly", "yes"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  localstack:
+    image: localstack/localstack:3.8
+    container_name: lambder-localstack
+    ports:
+      - "127.0.0.1:4566:4566"
+    environment:
+      SERVICES: lambda,apigateway,iam,logs,cloudformation,sts,s3,ssm
+      DEFAULT_REGION: ap-southeast-1
+      LAMBDA_EXECUTOR: docker
+      LAMBDA_DOCKER_NETWORK: lambder-dev_default
+      LS_LOG: warn
+      DOCKER_HOST: unix:///var/run/docker.sock
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./infrastructure/localstack/init:/etc/localstack/init/ready.d
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:4566/_localstack/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+volumes:
+  pg_data:
+  redis_data:

@@ -1,0 +1,53 @@
+service: lambder-products-api
+frameworkVersion: '4'
+
+plugins:
+  - serverless-localstack
+
+provider:
+  name: aws
+  runtime: nodejs22.x
+  architecture: arm64
+  memorySize: 512
+  timeout: 10
+  stage: ${opt:stage, 'local'}
+  region: ${opt:region, 'ap-southeast-1'}
+  environment:
+    NODE_OPTIONS: --enable-source-maps
+    DATABASE_URL: ${env:DATABASE_URL}
+    REDIS_URL: ${env:REDIS_URL}
+    JWT_PRIVATE_KEY_PEM: ${env:JWT_PRIVATE_KEY_PEM}
+    JWT_PUBLIC_KEY_PEM: ${env:JWT_PUBLIC_KEY_PEM}
+    JWT_ACCESS_TTL: '900'
+    JWT_REFRESH_TTL: '604800'
+    JWT_ISSUER: lambder
+    JWT_AUDIENCE: lambder.api
+  httpApi:
+    cors: true
+
+package:
+  individually: true
+  patterns:
+    - '!**'
+    - 'dist/**'
+
+functions:
+  api:
+    handler: dist/main.handler
+    events:
+      - httpApi: 'GET /products'
+      - httpApi: 'GET /products/{id}'
+      - httpApi: 'POST /products'
+      - httpApi: 'PATCH /products/{id}'
+      - httpApi: 'DELETE /products/{id}'
+      - httpApi: 'GET /health'
+
+custom:
+  localstack:
+    stages:
+      - local
+    host: http://localhost
+    edgePort: 4566
+    autostart: false
+    lambda:
+      mountCode: false
