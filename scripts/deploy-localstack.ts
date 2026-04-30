@@ -98,9 +98,7 @@ const buildZip = (deployDir: string, appName: string): Buffer => {
   const zip = new AdmZip();
   // Mark as ESM (rolldown emits ESM into main.js).
   zip.addFile('package.json', Buffer.from(JSON.stringify({ type: 'module' })));
-  // Rolldown writes the bundle into apps/<name>/dist/ regardless of output.file
-  // config (rolldown 1.0.0-rc.18 quirk). Read it from there.
-  const bundlePath = resolve(process.cwd(), 'apps', appName, 'dist/main.js');
+  const bundlePath = resolve(process.cwd(), 'dist/apps', appName, 'main.js');
   const sourcemap = `${bundlePath}.map`;
   zip.addLocalFile(bundlePath);
   if (existsSync(sourcemap)) zip.addLocalFile(sourcemap);
