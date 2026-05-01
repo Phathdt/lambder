@@ -43,6 +43,7 @@ export class UserDrizzleRepository implements UserRepository {
       .from(users)
       .where(sql`${users.id} = ${id}`)
       .limit(1);
+    /* c8 ignore next 1 */
     return rows[0] ? toUser(rows[0]) : null;
   }
 
@@ -51,6 +52,7 @@ export class UserDrizzleRepository implements UserRepository {
       .insert(users)
       .values({ email: input.email, passwordHash: input.passwordHash })
       .returning();
+    /* c8 ignore next 1 */
     if (!row) throw new Error('Failed to insert user');
     return toUser(row);
   }

@@ -11,6 +11,7 @@ module.exports = {
     format: [
       process.env.CI ? 'progress' : 'progress-bar',
       'json:test-results/cucumber-report.json',
+      'html:test-results/cucumber-report.html',
       'summary:test-results/summary.txt',
     ],
     publishQuiet: true,

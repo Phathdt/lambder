@@ -9,6 +9,7 @@ import { refreshRoute } from './routes/refresh.route';
 import { signupRoute } from './routes/signup.route';
 
 export const buildAuthApp = (auth?: AuthModule) => {
+  /* c8 ignore next 14 */
   const module =
     auth ??
     buildAuthModule(

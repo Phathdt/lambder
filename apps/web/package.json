@@ -10,7 +10,8 @@
     "typecheck": "tsc -b --noEmit",
     "test": "vitest run --config vitest.config.ts",
     "test:watch": "vitest --config vitest.config.ts",
-    "clean": "rm -rf dist .turbo node_modules/.tmp"
+    "test:coverage": "vitest run --config vitest.config.ts --coverage",
+    "clean": "rm -rf dist .turbo node_modules/.tmp coverage"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
@@ -41,6 +42,7 @@
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "^4.3.0",
+    "@vitest/coverage-v8": "^2.1.0",
     "jsdom": "^25.0.0",
     "tailwindcss": "^4.0.0",
     "typescript": "^5.6.0",

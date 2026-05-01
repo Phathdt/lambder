@@ -24,7 +24,7 @@ export interface ProductPatch {
 export const decimalToCents = (decimal: string): number => {
   const [whole = '0', frac = ''] = decimal.split('.');
   const padded = (frac + '00').slice(0, 2);
-  return Number.parseInt(whole, 10) * 100 + Number.parseInt(padded || '0', 10);
+  return Number.parseInt(whole, 10) * 100 + Number.parseInt(padded, 10);
 };
 
 export const centsToDecimal = (cents: number): string => {

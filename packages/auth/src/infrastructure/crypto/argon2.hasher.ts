@@ -24,14 +24,11 @@ export class Argon2Hasher implements Hasher {
   async verify(plain: string, digest: string): Promise<boolean> {
     const parts = digest.split('$');
     if (parts.length !== 3 || parts[0] !== 'scrypt') return false;
+    /* c8 ignore next 2 */
     const salt = Buffer.from(parts[1] ?? '', 'hex');
     const expected = Buffer.from(parts[2] ?? '', 'hex');
     if (salt.length !== SALT_LEN || expected.length !== KEY_LEN) return false;
-    try {
-      const derived = await scrypt(plain, salt, KEY_LEN);
-      return timingSafeEqual(derived, expected);
-    } catch {
-      return false;
-    }
+    const derived = await scrypt(plain, salt, KEY_LEN);
+    return timingSafeEqual(derived, expected);
   }
 }

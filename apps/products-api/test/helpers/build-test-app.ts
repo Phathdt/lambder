@@ -13,6 +13,7 @@ export interface TestAppEnv {
 }
 
 // Mirrors src/app.ts but skips loadConfig() (which would read process.env).
+// Kept minimal to match the original for compatibility with tests.
 export const buildTestProductsApp = (env: TestAppEnv) => {
   const products = buildProductsModule({ databaseUrl: env.databaseUrl });
   const jwt = new JoseJwtService({

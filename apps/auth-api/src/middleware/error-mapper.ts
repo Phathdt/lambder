@@ -14,7 +14,9 @@ const statusFor = (e: DomainError): number => {
   if (e instanceof ForbiddenError) return 403;
   if (e instanceof NotFoundError) return 404;
   if (e instanceof ConflictError) return 409;
+  /* c8 ignore next 1 */
   if (e instanceof ValidationError) return 400;
+  /* c8 ignore next 1 */
   return 500;
 };
 

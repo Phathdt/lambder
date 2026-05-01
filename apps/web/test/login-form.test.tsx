@@ -5,6 +5,12 @@ import { authApi } from '@/features/auth/api/auth-api';
 import { renderWithProviders, screen, waitFor } from './test-utils';
 
 vi.mock('@/features/auth/api/auth-api');
+vi.mock('sonner', () => ({
+  toast: {
+    success: vi.fn(),
+    error: vi.fn(),
+  },
+}));
 
 describe('LoginForm', () => {
   beforeEach(() => {
@@ -35,5 +41,22 @@ describe('LoginForm', () => {
     await waitFor(() =>
       expect(authApi.login).toHaveBeenCalledWith({ email: 'a@b.com', password: 'StrongPass1!@' }),
     );
+  });
+
+  test('shows error toast on login failure', async () => {
+    const { toast } = await import('sonner');
+    vi.mocked(authApi.login).mockRejectedValueOnce(
+      new Error('Invalid credentials'),
+    );
+
+    const user = userEvent.setup();
+    renderWithProviders(<LoginForm />);
+    await user.type(screen.getByLabelText(/email/i), 'a@b.com');
+    await user.type(screen.getByLabelText(/password/i), 'WrongPassword');
+    await user.click(screen.getByRole('button', { name: /^log in$/i }));
+
+    await waitFor(() => {
+      expect(vi.mocked(toast).error).toHaveBeenCalledWith('Login failed');
+    });
   });
 });

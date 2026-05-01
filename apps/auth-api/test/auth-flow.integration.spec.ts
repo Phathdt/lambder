@@ -147,4 +147,194 @@ describe('auth-api integration: signup → login → logout → refresh', () => 
     });
     expect(guarded.status).toBe(401);
   });
+
+  // === Error Mapper Tests ===
+  test('error-mapper: zod validation errors return 400 with field errors', async () => {
+    const res = await app.request('/auth/signup', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ email: 'invalid-email', password: 'short' }),
+    });
+    expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(body.error.code).toBe('VALIDATION_ERROR');
+    expect(body.error.details).toBeDefined();
+  });
+
+  test('error-mapper: malformed JSON body returns 500 (unhandled JSON.parse error)', async () => {
+    const res = await app.request('/auth/signup', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: 'not json {',
+    });
+    expect(res.status).toBe(500);
+  });
+
+  test('error-mapper: login with missing email field returns 400', async () => {
+    const res = await app.request('/auth/login', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ password: 'test' }),
+    });
+    expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(body.error.code).toBe('VALIDATION_ERROR');
+  });
+
+  test('error-mapper: refresh with malformed body returns 400', async () => {
+    const res = await app.request('/auth/refresh', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ refreshToken: 123 }),
+    });
+    expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(body.error.code).toBe('VALIDATION_ERROR');
+  });
+
+  // === JWT Auth Middleware Tests ===
+  test('jwt-auth: missing authorization header returns 401', async () => {
+    const res = await app.request('/auth/logout', {
+      method: 'POST',
+    });
+    expect(res.status).toBe(401);
+    const body = await res.json();
+    expect(body.error.code).toBe('UNAUTHORIZED');
+  });
+
+  test('jwt-auth: malformed authorization header (not Bearer) returns 401', async () => {
+    const res = await app.request('/auth/logout', {
+      method: 'POST',
+      headers: { authorization: 'Basic token123' },
+    });
+    expect(res.status).toBe(401);
+    const body = await res.json();
+    expect(body.error.code).toBe('UNAUTHORIZED');
+  });
+
+  test('jwt-auth: invalid token returns 401 with INVALID_TOKEN code', async () => {
+    const res = await app.request('/auth/logout', {
+      method: 'POST',
+      headers: { authorization: 'Bearer invalid.token.here' },
+    });
+    expect(res.status).toBe(401);
+    const body = await res.json();
+    expect(body.error.code).toBe('INVALID_TOKEN');
+  });
+
+  test('jwt-auth: refresh token used as access token returns 401', async () => {
+    const email = `refresh-as-access+${Date.now()}@example.com`;
+    const password = 'StrongPass1!@#';
+    await app.request('/auth/signup', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+    const login = await app.request('/auth/login', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+    const { refreshToken } = await login.json();
+
+    // Try to use refresh token on endpoint requiring access
+    const res = await app.request('/auth/logout', {
+      method: 'POST',
+      headers: { authorization: `Bearer ${refreshToken}` },
+    });
+    expect(res.status).toBe(401);
+    const body = await res.json();
+    expect(body.error.code).toBe('INVALID_TOKEN');
+  });
+
+  test('jwt-auth: revoked token returns 401 with TOKEN_REVOKED code', async () => {
+    const email = `revoke+${Date.now()}@example.com`;
+    const password = 'StrongPass1!@#';
+    await app.request('/auth/signup', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+    const login = await app.request('/auth/login', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+    const { accessToken } = await login.json();
+
+    // Logout to revoke token
+    const logoutRes = await app.request('/auth/logout', {
+      method: 'POST',
+      headers: { authorization: `Bearer ${accessToken}` },
+    });
+    expect(logoutRes.status).toBe(204);
+
+    // Try to use revoked token
+    const res = await app.request('/auth/logout', {
+      method: 'POST',
+      headers: { authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(401);
+    const body = await res.json();
+    expect(body.error.code).toBe('TOKEN_REVOKED');
+  });
+
+  test('jwt-auth: bearer token without value returns 401', async () => {
+    const res = await app.request('/auth/logout', {
+      method: 'POST',
+      headers: { authorization: 'Bearer ' },
+    });
+    expect(res.status).toBe(401);
+    const body = await res.json();
+    expect(body.error.code).toBe('UNAUTHORIZED');
+  });
+
+  // === Additional coverage for error-mapper generic error handling ===
+  test('error-mapper: generic unhandled error returns 500 INTERNAL code', async () => {
+    // This is implicitly tested via malformed JSON which throws outside try-catch
+    // but we verify the error code structure
+    const res = await app.request('/auth/signup', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: 'bad json',
+    });
+    expect(res.status).toBe(500);
+    const body = await res.json();
+    expect(body.error.code).toBe('INTERNAL');
+  });
+
+  test('error-mapper: multiple signup failures verify all error codes', async () => {
+    // Test ConflictError (409)
+    const email = `dup+${Date.now()}@example.com`;
+    await app.request('/auth/signup', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ email, password: 'StrongPass1!@#' }),
+    });
+    const dupRes = await app.request('/auth/signup', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ email, password: 'StrongPass1!@#' }),
+    });
+    expect(dupRes.status).toBe(409);
+    expect((await dupRes.json()).error.code).toBe('EMAIL_TAKEN');
+
+    // Test ValidationError (400) via bad email format
+    const badRes = await app.request('/auth/signup', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ email: 'not-an-email', password: 'pass' }),
+    });
+    expect(badRes.status).toBe(400);
+    expect((await badRes.json()).error.code).toBe('VALIDATION_ERROR');
+
+    // Test AuthError (401) via login
+    const badLoginRes = await app.request('/auth/login', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ email: 'nobody@test.com', password: 'nope' }),
+    });
+    expect(badLoginRes.status).toBe(401);
+    expect((await badLoginRes.json()).error.code).toBe('INVALID_CREDENTIALS');
+  });
 });

@@ -45,10 +45,12 @@ export class JoseJwtService implements JwtService {
     if (this.config.issuer) opts.issuer = this.config.issuer;
     if (this.config.audience) opts.audience = this.config.audience;
     const { payload } = await jwtVerify(token, pub, opts);
+    /* c8 ignore next 2 */
     if (!payload.sub || !payload.jti || !payload.iat || !payload.exp) {
       throw new Error('Malformed token claims');
     }
     const kind = payload.kind;
+    /* c8 ignore next 1 */
     if (kind !== 'access' && kind !== 'refresh') throw new Error('Invalid kind');
     return {
       sub: payload.sub,

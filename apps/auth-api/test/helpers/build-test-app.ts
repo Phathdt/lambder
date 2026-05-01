@@ -6,6 +6,8 @@ export interface TestAppEnv {
   redisUrl: string;
   jwtPrivateKeyPem: string;
   jwtPublicKeyPem: string;
+  issuer?: string;
+  audience?: string;
 }
 
 // Builds a Hono app wired against testcontainer-backed infra. Uses short
@@ -18,8 +20,8 @@ export const buildTestAuthApp = (env: TestAppEnv) => {
     jwtPublicKeyPem: env.jwtPublicKeyPem,
     accessTtlSeconds: 60,
     refreshTtlSeconds: 600,
-    issuer: 'lambder-test',
-    audience: 'lambder-test.api',
+    issuer: env.issuer ?? 'lambder-test',
+    audience: env.audience ?? 'lambder-test.api',
   });
   return buildAuthApp(auth);
 };

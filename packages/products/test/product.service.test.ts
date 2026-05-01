@@ -105,6 +105,40 @@ describe('ProductService — update', () => {
     expect(isOk(result)).toBe(true);
     if (isOk(result)) expect(result.value.description).toBe('original');
   });
+
+  test('description can be updated to new value', async () => {
+    const svc = makeService();
+    const p = await svc.create({
+      ownerId: 'u1',
+      name: 'X',
+      description: 'original',
+      price: '1.00',
+    });
+    const result = await svc.update({
+      actorId: 'u1',
+      id: p.id,
+      patch: { description: 'updated' },
+    });
+    expect(isOk(result)).toBe(true);
+    if (isOk(result)) expect(result.value.description).toBe('updated');
+  });
+
+  test('description can be cleared by passing null', async () => {
+    const svc = makeService();
+    const p = await svc.create({
+      ownerId: 'u1',
+      name: 'X',
+      description: 'original',
+      price: '1.00',
+    });
+    const result = await svc.update({
+      actorId: 'u1',
+      id: p.id,
+      patch: { description: null },
+    });
+    expect(isOk(result)).toBe(true);
+    if (isOk(result)) expect(result.value.description).toBeNull();
+  });
 });
 
 describe('ProductService — delete', () => {

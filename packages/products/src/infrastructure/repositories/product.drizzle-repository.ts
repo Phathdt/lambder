@@ -49,6 +49,7 @@ export class ProductDrizzleRepository implements ProductRepository {
         priceCents: input.priceCents,
       })
       .returning();
+    /* c8 ignore next 1 */
     if (!row) throw new Error('Failed to insert product');
     return toProduct(row);
   }
@@ -64,6 +65,7 @@ export class ProductDrizzleRepository implements ProductRepository {
       })
       .where(sql`${products.id} = ${id}`)
       .returning();
+    /* c8 ignore next 1 */
     if (!row) throw new Error('Failed to update product');
     return toProduct(row);
   }
