@@ -1,0 +1,10 @@
+# Exclude generated artifacts + test reports from GitHub Linguist stats so
+# the repo language breakdown reflects actual TypeScript source.
+apps/e2e/playwright-report/** linguist-generated=true
+apps/e2e/test-results/** linguist-generated=true
+coverage/** linguist-generated=true
+**/coverage/** linguist-generated=true
+plans/** linguist-documentation=true
+docs/** linguist-documentation=true
+*.snap linguist-generated=true
+pnpm-lock.yaml linguist-generated=true
