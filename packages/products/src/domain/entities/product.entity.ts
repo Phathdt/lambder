@@ -29,7 +29,9 @@ export const decimalToCents = (decimal: string): number => {
 
 export const centsToDecimal = (cents: number): string => {
   const whole = Math.trunc(cents / 100);
-  const frac = Math.abs(cents % 100).toString().padStart(2, '0');
+  const frac = Math.abs(cents % 100)
+    .toString()
+    .padStart(2, '0');
   return `${whole}.${frac}`;
 };
 

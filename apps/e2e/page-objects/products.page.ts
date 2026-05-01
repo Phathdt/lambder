@@ -41,7 +41,10 @@ export class ProductsPageObject {
 
   async deleteProduct(name: string) {
     // Cards aren't <article> by default; locate via the card title text + scoped delete.
-    const card = this.page.locator('div').filter({ hasText: new RegExp(`^${name}`) }).first();
+    const card = this.page
+      .locator('div')
+      .filter({ hasText: new RegExp(`^${name}`) })
+      .first();
     await card.getByRole('button', { name: /delete/i }).click();
   }
 

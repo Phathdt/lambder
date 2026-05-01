@@ -127,7 +127,10 @@ describe('auth-api: domain error branches (statusFor coverage)', () => {
     const noDigit = await app.request('/auth/signup', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ email: `nodigit+${Date.now()}@test.com`, password: 'LongPassword!@#' }),
+      body: JSON.stringify({
+        email: `nodigit+${Date.now()}@test.com`,
+        password: 'LongPassword!@#',
+      }),
     });
     expect(noDigit.status).toBe(400);
 
@@ -135,7 +138,10 @@ describe('auth-api: domain error branches (statusFor coverage)', () => {
     const noSymbol = await app.request('/auth/signup', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ email: `nosymbol+${Date.now()}@test.com`, password: 'LongPassword123' }),
+      body: JSON.stringify({
+        email: `nosymbol+${Date.now()}@test.com`,
+        password: 'LongPassword123',
+      }),
     });
     expect(noSymbol.status).toBe(400);
   });

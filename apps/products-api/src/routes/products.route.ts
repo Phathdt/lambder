@@ -33,7 +33,7 @@ export const productsRoute = (deps: ProductsRouteDeps) => {
   });
 
   app.get('/:id', async (c) => {
-    const result = await deps.products.products.get(c.req.param('id'));
+    const result = await deps.products.products.get(c.req.param('id')!);
     if (isErr(result)) return mapError(result.error, c);
     return c.json(toProductDto(result.value));
   });
@@ -61,8 +61,8 @@ export const productsRoute = (deps: ProductsRouteDeps) => {
     const actorId = c.get('userId') as string;
     const result = await deps.products.products.update({
       actorId,
-      id: c.req.param('id'),
-      patch,
+      id: c.req.param('id')!,
+      patch: patch as { name?: string; description?: string | undefined; price?: string },
     });
     if (isErr(result)) return mapError(result.error, c);
     return c.json(toProductDto(result.value));
@@ -70,7 +70,7 @@ export const productsRoute = (deps: ProductsRouteDeps) => {
 
   app.delete('/:id', guard, async (c) => {
     const actorId = c.get('userId') as string;
-    const result = await deps.products.products.delete({ actorId, id: c.req.param('id') });
+    const result = await deps.products.products.delete({ actorId, id: c.req.param('id')! });
     if (isErr(result)) return mapError(result.error, c);
     return c.body(null, 204);
   });

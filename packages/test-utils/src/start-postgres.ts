@@ -1,10 +1,7 @@
 import { execSync } from 'node:child_process';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import {
-  PostgreSqlContainer,
-  type StartedPostgreSqlContainer,
-} from '@testcontainers/postgresql';
+import { PostgreSqlContainer, type StartedPostgreSqlContainer } from '@testcontainers/postgresql';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(HERE, '../../..');
@@ -15,9 +12,7 @@ export interface StartedPostgres {
 }
 
 export async function startPostgres(): Promise<StartedPostgres> {
-  const container: StartedPostgreSqlContainer = await new PostgreSqlContainer(
-    'postgres:16-alpine',
-  )
+  const container: StartedPostgreSqlContainer = await new PostgreSqlContainer('postgres:16-alpine')
     .withDatabase('lambder_test')
     .withUsername('lambder')
     .withPassword('lambder')

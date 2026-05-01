@@ -25,7 +25,9 @@ describe('ProductCreateForm', () => {
     await user.click(screen.getByRole('button', { name: /add/i }));
 
     // Should show validation error for required name field (min 1 char error)
-    expect(await screen.findByText(/string must contain at least 1 character/i)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/string must contain at least 1 character/i),
+    ).toBeInTheDocument();
     expect(vi.mocked(productsApi.create)).not.toHaveBeenCalled();
   });
 

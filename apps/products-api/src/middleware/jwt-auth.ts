@@ -1,6 +1,12 @@
 import type { JwtService, TokenStore } from '@lambder/auth';
 import type { Context, Next } from 'hono';
 
+declare module 'hono' {
+  interface ContextVariableMap {
+    userId: string;
+  }
+}
+
 const unauthorized = (c: Context, code = 'UNAUTHORIZED') =>
   c.json({ error: { code, message: 'Unauthorized' } }, 401);
 

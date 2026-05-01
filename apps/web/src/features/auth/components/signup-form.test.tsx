@@ -40,9 +40,7 @@ describe('SignupForm', () => {
 
   test('shows error toast on signup failure', async () => {
     const { toast } = await import('sonner');
-    vi.mocked(authApi.signup).mockRejectedValueOnce(
-      new Error('Email already exists'),
-    );
+    vi.mocked(authApi.signup).mockRejectedValueOnce(new Error('Email already exists'));
 
     const user = userEvent.setup();
     renderWithProviders(<SignupForm />);

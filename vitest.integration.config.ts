@@ -13,10 +13,7 @@ export default defineConfig({
   test: {
     // Go-style colocation: integration specs sit next to their feature target
     // (e.g. apps/auth-api/src/auth-flow.integration.spec.ts).
-    include: [
-      'apps/**/src/**/*.integration.spec.ts',
-      'packages/**/src/**/*.integration.spec.ts',
-    ],
+    include: ['apps/**/src/**/*.integration.spec.ts', 'packages/**/src/**/*.integration.spec.ts'],
     exclude: ['**/node_modules/**', '**/dist/**', '**/__test-helpers__/**'],
     testTimeout: 120_000,
     hookTimeout: 180_000,

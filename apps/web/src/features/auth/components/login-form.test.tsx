@@ -45,9 +45,7 @@ describe('LoginForm', () => {
 
   test('shows error toast on login failure', async () => {
     const { toast } = await import('sonner');
-    vi.mocked(authApi.login).mockRejectedValueOnce(
-      new Error('Invalid credentials'),
-    );
+    vi.mocked(authApi.login).mockRejectedValueOnce(new Error('Invalid credentials'));
 
     const user = userEvent.setup();
     renderWithProviders(<LoginForm />);

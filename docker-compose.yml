@@ -5,7 +5,7 @@ services:
     image: postgres:16-alpine
     container_name: lambder-postgres
     ports:
-      - "127.0.0.1:5432:5432"
+      - '127.0.0.1:5432:5432'
     environment:
       POSTGRES_DB: lambder
       POSTGRES_USER: lambder
@@ -13,7 +13,7 @@ services:
     volumes:
       - pg_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U lambder -d lambder"]
+      test: ['CMD-SHELL', 'pg_isready -U lambder -d lambder']
       interval: 5s
       timeout: 3s
       retries: 10
@@ -22,12 +22,12 @@ services:
     image: redis:7-alpine
     container_name: lambder-redis
     ports:
-      - "127.0.0.1:6369:6379"
+      - '127.0.0.1:6369:6379'
     volumes:
       - redis_data:/data
-    command: ["redis-server", "--appendonly", "yes"]
+    command: ['redis-server', '--appendonly', 'yes']
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ['CMD', 'redis-cli', 'ping']
       interval: 5s
       timeout: 3s
       retries: 10
@@ -36,7 +36,7 @@ services:
     image: localstack/localstack:3.8
     container_name: lambder-localstack
     ports:
-      - "127.0.0.1:4566:4566"
+      - '127.0.0.1:4566:4566'
     environment:
       SERVICES: lambda,apigateway,iam,logs,cloudformation,sts,s3,ssm,sqs
       DEFAULT_REGION: ap-southeast-1
@@ -48,9 +48,9 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./infrastructure/localstack/init:/etc/localstack/init/ready.d
     extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - 'host.docker.internal:host-gateway'
     healthcheck:
-      test: ["CMD", "curl", "-fsS", "http://localhost:4566/_localstack/health"]
+      test: ['CMD', 'curl', '-fsS', 'http://localhost:4566/_localstack/health']
       interval: 5s
       timeout: 3s
       retries: 20
@@ -65,52 +65,52 @@ services:
     image: otel/opentelemetry-collector-contrib:0.117.0
     container_name: lambder-otel-collector
     ports:
-      - "127.0.0.1:4317:4317" # OTLP gRPC
-      - "127.0.0.1:4318:4318" # OTLP HTTP
-      - "127.0.0.1:8889:8889" # Prometheus exporter
+      - '127.0.0.1:4317:4317' # OTLP gRPC
+      - '127.0.0.1:4318:4318' # OTLP HTTP
+      - '127.0.0.1:8889:8889' # Prometheus exporter
     volumes:
       - ./infrastructure/grafana/otel-collector.yaml:/etc/otelcol-contrib/config.yaml
-    command: ["--config=/etc/otelcol-contrib/config.yaml"]
+    command: ['--config=/etc/otelcol-contrib/config.yaml']
     depends_on: [tempo, loki]
 
   tempo:
     image: grafana/tempo:2.6.0
     container_name: lambder-tempo
-    command: ["-config.file=/etc/tempo.yaml"]
+    command: ['-config.file=/etc/tempo.yaml']
     volumes:
       - ./infrastructure/grafana/tempo.yaml:/etc/tempo.yaml
       - tempo_data:/var/tempo
     ports:
-      - "127.0.0.1:3200:3200"
+      - '127.0.0.1:3200:3200'
 
   loki:
     image: grafana/loki:3.3.0
     container_name: lambder-loki
-    command: ["-config.file=/etc/loki/loki.yaml"]
+    command: ['-config.file=/etc/loki/loki.yaml']
     volumes:
       - ./infrastructure/grafana/loki.yaml:/etc/loki/loki.yaml
     ports:
-      - "127.0.0.1:3100:3100"
+      - '127.0.0.1:3100:3100'
 
   prometheus:
     image: prom/prometheus:v3.0.1
     container_name: lambder-prometheus
-    command: ["--config.file=/etc/prometheus/prometheus.yaml"]
+    command: ['--config.file=/etc/prometheus/prometheus.yaml']
     volumes:
       - ./infrastructure/grafana/prometheus.yaml:/etc/prometheus/prometheus.yaml
     ports:
-      - "127.0.0.1:9090:9090"
+      - '127.0.0.1:9090:9090'
 
   grafana:
     image: grafana/grafana:11.3.0
     container_name: lambder-grafana
     ports:
-      - "127.0.0.1:3000:3000"
+      - '127.0.0.1:3000:3000'
     environment:
-      GF_AUTH_ANONYMOUS_ENABLED: "true"
-      GF_AUTH_ANONYMOUS_ORG_ROLE: "Admin"
-      GF_AUTH_DISABLE_LOGIN_FORM: "true"
-      GF_FEATURE_TOGGLES_ENABLE: "traceToLogs"
+      GF_AUTH_ANONYMOUS_ENABLED: 'true'
+      GF_AUTH_ANONYMOUS_ORG_ROLE: 'Admin'
+      GF_AUTH_DISABLE_LOGIN_FORM: 'true'
+      GF_FEATURE_TOGGLES_ENABLE: 'traceToLogs'
     volumes:
       - ./infrastructure/grafana/grafana-provisioning:/etc/grafana/provisioning
       - grafana_data:/var/lib/grafana

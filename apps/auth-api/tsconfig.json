@@ -1,4 +1,10 @@
 {
   "extends": "@lambder/tsconfig/app.json",
-  "include": ["src/**/*", "test/**/*", "rolldown.config.ts"]
+  "include": ["src/**/*"],
+  "exclude": [
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx",
+    "src/**/*.integration.spec.ts",
+    "src/__test-helpers__/**"
+  ]
 }

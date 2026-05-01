@@ -37,6 +37,8 @@ describe('SqsEmailEnqueuer', () => {
   test('propagates SDK errors so caller can decide swallow vs retry', async () => {
     sendMock.mockRejectedValueOnce(new Error('throttled'));
     const enq = new SqsEmailEnqueuer({ queueUrl: 'http://localhost:4566/000000000000/test' });
-    await expect(enq.enqueueWelcome({ userId: 'u', email: 'a@b.com' })).rejects.toThrow('throttled');
+    await expect(enq.enqueueWelcome({ userId: 'u', email: 'a@b.com' })).rejects.toThrow(
+      'throttled',
+    );
   });
 });

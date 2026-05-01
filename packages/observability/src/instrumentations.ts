@@ -12,5 +12,7 @@ export const pickInstrumentations = () => [
   new AwsInstrumentation({ suppressInternalInstrumentation: true }),
   new PgInstrumentation({ enhancedDatabaseReporting: false }),
   new IORedisInstrumentation(),
-  new PinoInstrumentation({ logKeys: { traceId: 'traceId', spanId: 'spanId', traceFlags: 'traceFlags' } }),
+  new PinoInstrumentation({
+    logKeys: { traceId: 'traceId', spanId: 'spanId', traceFlags: 'traceFlags' },
+  }),
 ];

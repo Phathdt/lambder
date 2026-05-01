@@ -1,5 +1,8 @@
 import type { EmailEnqueuer } from './domain/interfaces/email-enqueuer';
-import { SqsEmailEnqueuer, type SqsEnqueuerConfig } from './infrastructure/enqueuers/sqs-email.enqueuer';
+import {
+  SqsEmailEnqueuer,
+  type SqsEnqueuerConfig,
+} from './infrastructure/enqueuers/sqs-email.enqueuer';
 
 export interface EmailModuleConfig extends SqsEnqueuerConfig {}
 

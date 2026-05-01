@@ -2,7 +2,12 @@ import { describe, expect, test, vi, beforeEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
-import { useProducts, useCreateProduct, useUpdateProduct, useDeleteProduct } from '@/features/products/hooks/use-products';
+import {
+  useProducts,
+  useCreateProduct,
+  useUpdateProduct,
+  useDeleteProduct,
+} from '@/features/products/hooks/use-products';
 import { productsApi } from '@/features/products/api/products-api';
 
 vi.mock('@/features/products/api/products-api');
@@ -81,7 +86,11 @@ describe('Products Hooks', () => {
 
       expect(result.current.isPending).toBe(false);
 
-      result.current.mutateAsync({ name: 'New Widget', price: '9.99', description: 'A new widget' });
+      result.current.mutateAsync({
+        name: 'New Widget',
+        price: '9.99',
+        description: 'A new widget',
+      });
 
       await waitFor(() => {
         expect(vi.mocked(productsApi.create)).toHaveBeenCalledWith({

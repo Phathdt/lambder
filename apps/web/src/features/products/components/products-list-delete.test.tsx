@@ -2,7 +2,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, test, vi, beforeEach } from 'vitest';
 import { ProductsList } from '@/features/products/components/products-list';
 import { productsApi } from '@/features/products/api/products-api';
-import { renderWithProviders, screen, waitFor, within } from '@/__test-utils__/test-utils';
+import { renderWithProviders, screen, waitFor } from '@/__test-utils__/test-utils';
 
 vi.mock('@/features/products/api/products-api');
 vi.mock('sonner', () => ({

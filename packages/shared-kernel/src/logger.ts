@@ -24,7 +24,17 @@ export const createLogger = (config: LoggerConfig): Logger => {
       level: (label) => ({ level: label }),
     },
     // Drop these from logs since Lambda already adds requestId via env.
-    redact: { paths: ['password', '*.password', 'authorization', '*.authorization', 'accessToken', 'refreshToken'], remove: true },
+    redact: {
+      paths: [
+        'password',
+        '*.password',
+        'authorization',
+        '*.authorization',
+        'accessToken',
+        'refreshToken',
+      ],
+      remove: true,
+    },
   };
 
   if (config.pretty) {
@@ -32,7 +42,11 @@ export const createLogger = (config: LoggerConfig): Logger => {
       ...opts,
       transport: {
         target: 'pino-pretty',
-        options: { colorize: true, translateTime: 'HH:MM:ss.l', ignore: 'pid,hostname,service,env' },
+        options: {
+          colorize: true,
+          translateTime: 'HH:MM:ss.l',
+          ignore: 'pid,hostname,service,env',
+        },
       },
     });
   }

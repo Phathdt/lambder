@@ -58,9 +58,6 @@ When('I submit my email with the wrong password', async function (this: BrowserW
   await new LoginPageObject(this.page).fillAndSubmit(creds.email, 'wrong-password-123!');
 });
 
-Then(
-  'I should see an {string} error',
-  async function (this: BrowserWorld, _label: string) {
-    await expect(this.page.getByText(/invalid email or password/i)).toBeVisible();
-  },
-);
+Then('I should see an {string} error', async function (this: BrowserWorld, _label: string) {
+  await expect(this.page.getByText(/invalid email or password/i)).toBeVisible();
+});

@@ -1,15 +1,10 @@
 {
-  "compilerOptions": {
-    "target": "ES2023",
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
-    "strict": true,
-    "noUncheckedIndexedAccess": true,
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "isolatedModules": true,
-    "allowImportingTsExtensions": false,
-    "noEmit": true
-  },
-  "include": ["src/**/*"]
+  "extends": "@lambder/tsconfig/app.json",
+  "include": ["src/**/*"],
+  "exclude": [
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx",
+    "src/**/*.integration.spec.ts",
+    "src/__test-helpers__/**"
+  ]
 }

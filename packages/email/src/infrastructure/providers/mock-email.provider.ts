@@ -8,9 +8,6 @@ export class MockEmailProvider implements EmailProvider {
   constructor(private readonly logger: Logger) {}
 
   async send(email: Email): Promise<void> {
-    this.logger.info(
-      { to: email.to, subject: email.subject, body: email.body },
-      'email.sent',
-    );
+    this.logger.info({ to: email.to, subject: email.subject, body: email.body }, 'email.sent');
   }
 }

@@ -6,16 +6,23 @@ import {
   createFakeJwtService,
   createFakeTokenStore,
   createFakeUserRepository,
-  type FakeJwtService,
-  type FakeTokenStore,
-  type FakeUserRepository,
 } from '../../__test-fakes__/fakes';
 import { AuthService } from './auth.service';
 
 const stubLogger = (): Logger =>
-  ({ error: vi.fn(), info: vi.fn(), warn: vi.fn(), debug: vi.fn(), trace: vi.fn(), fatal: vi.fn(), child: vi.fn() } as unknown as Logger);
+  ({
+    error: vi.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+    debug: vi.fn(),
+    trace: vi.fn(),
+    fatal: vi.fn(),
+    child: vi.fn(),
+  }) as unknown as Logger;
 
-const buildService = (overrides: { emailEnqueuer?: InMemoryEmailEnqueuer; logger?: Logger } = {}) => {
+const buildService = (
+  overrides: { emailEnqueuer?: InMemoryEmailEnqueuer; logger?: Logger } = {},
+) => {
   const users = createFakeUserRepository();
   const hasher = createFakeHasher();
   const jwt = createFakeJwtService();

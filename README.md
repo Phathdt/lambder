@@ -31,7 +31,7 @@ Runs locally on LocalStack, deploys to real AWS unchanged.
 - **Async**: SQS + event source mapping, fire-and-forget enqueue, DLQ with
   `maxReceiveCount=3`, partial-batch failure responses
 - **Frontend**: React 19 + Vite + Tailwind v4 + shadcn + react-hook-form + Zod
-  + TanStack Query + axios + sonner toasts
+  - TanStack Query + axios + sonner toasts
 - **Validation**: Zod schemas in `@lambder/contracts` shared between FE + BE
 - **Bundler**: Rolldown (ESM Lambda bundles, ~4–23 KB per function)
 - **Lint/format**: Oxlint + Prettier
@@ -126,6 +126,7 @@ POST /auth/signup
 ```
 
 Failure modes:
+
 - SQS down at signup → log error, **signup still returns 201** (best-effort).
 - Worker throws → SQS redrives up to 3× → DLQ.
 - Bad message body → reported via `batchItemFailures`, only that one redrives.
@@ -143,11 +144,11 @@ pnpm test:coverage:fe             # HTML in apps/web/coverage/
 pnpm test:coverage:integration    # HTML in coverage/integration/
 ```
 
-| Tier | Lines | Branches | Funcs |
-|---|---|---|---|
-| BE unit | 100% | 100% | 100% |
-| FE unit | 99.4% | 96.8% | 97.3% |
-| BE integration | 97.1% | 95.6% | 93.9% |
+| Tier           | Lines | Branches | Funcs |
+| -------------- | ----- | -------- | ----- |
+| BE unit        | 100%  | 100%     | 100%  |
+| FE unit        | 99.4% | 96.8%    | 97.3% |
+| BE integration | 97.1% | 95.6%    | 93.9% |
 
 ## Observability
 

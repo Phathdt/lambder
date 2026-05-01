@@ -13,7 +13,7 @@ const stubLogger = (): Logger =>
     silent: vi.fn(),
     child: vi.fn(),
     level: 'info',
-  } as unknown as Logger);
+  }) as unknown as Logger;
 
 describe('MockEmailProvider', () => {
   test('logs the email payload with `email.sent` event name', async () => {

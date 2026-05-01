@@ -7,9 +7,7 @@ import type { Context, MiddlewareHandler } from 'hono';
 export const requestLogger = (rootLogger: Logger): MiddlewareHandler => {
   return async (c: Context, next) => {
     const requestId =
-      c.req.header('x-amzn-trace-id') ??
-      c.req.header('x-request-id') ??
-      crypto.randomUUID();
+      c.req.header('x-amzn-trace-id') ?? c.req.header('x-request-id') ?? crypto.randomUUID();
 
     const start = performance.now();
     const log = rootLogger.child({ requestId, method: c.req.method, path: c.req.path });

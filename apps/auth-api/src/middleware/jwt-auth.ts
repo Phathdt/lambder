@@ -11,6 +11,13 @@ export interface JwtAuthVars {
   jti: string;
 }
 
+declare module 'hono' {
+  interface ContextVariableMap {
+    userId: string;
+    jti: string;
+  }
+}
+
 const unauthorized = (c: Context, code = 'UNAUTHORIZED') =>
   c.json({ error: { code, message: 'Unauthorized' } }, 401);
 

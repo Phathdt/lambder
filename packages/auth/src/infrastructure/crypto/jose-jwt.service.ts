@@ -1,6 +1,11 @@
 import { SignJWT, importPKCS8, importSPKI, jwtVerify, type KeyLike } from 'jose';
 import { randomUUID } from 'node:crypto';
-import type { JwtClaims, JwtKind, JwtService, SignedToken } from '../../domain/interfaces/jwt-service';
+import type {
+  JwtClaims,
+  JwtKind,
+  JwtService,
+  SignedToken,
+} from '../../domain/interfaces/jwt-service';
 
 const ALG = 'EdDSA';
 

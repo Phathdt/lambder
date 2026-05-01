@@ -53,10 +53,7 @@ export class AuthService implements AuthServiceContract {
     try {
       await this.emailEnqueuer.enqueueWelcome({ userId: user.id, email: user.email });
     } catch (error) {
-      this.logger?.error(
-        { err: error, userId: user.id },
-        'welcome-email.enqueue-failed',
-      );
+      this.logger?.error({ err: error, userId: user.id }, 'welcome-email.enqueue-failed');
     }
 
     return ok(toPublicUser(user));

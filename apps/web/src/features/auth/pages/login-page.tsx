@@ -8,7 +8,10 @@ export function LoginPage() {
         <LoginForm />
         <p className="text-center text-sm text-muted-foreground">
           No account?{' '}
-          <Link to="/signup" className="font-medium text-primary underline-offset-4 hover:underline">
+          <Link
+            to="/signup"
+            className="font-medium text-primary underline-offset-4 hover:underline"
+          >
             Sign up
           </Link>
         </p>

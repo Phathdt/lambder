@@ -12,10 +12,7 @@ import {
 // reads the attributes via `extractTraceContextFromSqsRecord` to resume the
 // distributed trace.
 
-export type SqsMessageAttributes = Record<
-  string,
-  { DataType: string; StringValue?: string }
->;
+export type SqsMessageAttributes = Record<string, { DataType: string; StringValue?: string }>;
 
 const setter: TextMapSetter<SqsMessageAttributes> = {
   set(carrier, key, value) {
@@ -42,12 +39,12 @@ export const injectTraceContextIntoSqsAttrs = (
 // `AWSTraceHeader` system attribute if the X-Ray active tracing header is
 // the only thing present).
 export const extractTraceContextFromSqsRecord = (record: {
-  messageAttributes?: Record<string, { stringValue?: string; dataType?: string }>;
+  messageAttributes?: Record<string, { stringValue?: string | undefined; dataType: string }>;
 }): Context => {
   const carrier: SqsMessageAttributes = {};
   for (const [k, v] of Object.entries(record.messageAttributes ?? {})) {
     if (v.stringValue) {
-      carrier[k] = { DataType: v.dataType ?? 'String', StringValue: v.stringValue };
+      carrier[k] = { DataType: v.dataType, StringValue: v.stringValue };
     }
   }
   return propagation.extract(context.active(), carrier, getter);

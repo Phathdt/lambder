@@ -12,8 +12,7 @@ import { signupRoute } from './routes/signup.route';
 
 export const buildAuthApp = (auth?: AuthModule, logger?: Logger) => {
   const log =
-    logger ??
-    createLogger({ service: 'auth-api', pretty: process.env.NODE_ENV !== 'production' });
+    logger ?? createLogger({ service: 'auth-api', pretty: process.env.NODE_ENV !== 'production' });
   /* c8 ignore next 22 */
   const module =
     auth ??

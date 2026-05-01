@@ -1,9 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import type { NewProduct, Product, ProductPatch } from '../domain/entities/product.entity';
-import type {
-  ProductPage,
-  ProductRepository,
-} from '../domain/interfaces/product.repository';
+import type { ProductPage, ProductRepository } from '../domain/interfaces/product.repository';
 
 export interface FakeProductRepository extends ProductRepository {
   readonly items: Map<string, Product>;
@@ -19,7 +16,10 @@ export const createFakeProductRepository = (): FakeProductRepository => {
     async list({ limit, cursor }): Promise<ProductPage> {
       const all = [...items.values()].toSorted((a, b) => a.id.localeCompare(b.id));
       const start = cursor ? all.findIndex((p) => p.id > cursor) : 0;
-      const slice = all.slice(start === -1 ? all.length : start, (start === -1 ? all.length : start) + limit + 1);
+      const slice = all.slice(
+        start === -1 ? all.length : start,
+        (start === -1 ? all.length : start) + limit + 1,
+      );
       const hasMore = slice.length > limit;
       const page = hasMore ? slice.slice(0, limit) : slice;
       const last = page.at(-1);

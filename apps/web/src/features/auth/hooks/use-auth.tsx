@@ -43,10 +43,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser({ id: claims?.sub ?? '', email });
   }, []);
 
-  const signup = useCallback(async (email: string, password: string) => {
-    await authApi.signup({ email, password });
-    await login(email, password);
-  }, [login]);
+  const signup = useCallback(
+    async (email: string, password: string) => {
+      await authApi.signup({ email, password });
+      await login(email, password);
+    },
+    [login],
+  );
 
   const logout = useCallback(async () => {
     try {

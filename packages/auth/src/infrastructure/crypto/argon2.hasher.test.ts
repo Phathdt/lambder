@@ -1,4 +1,4 @@
-import { describe, expect, test, vi, beforeEach } from 'vitest';
+import { describe, expect, test, beforeEach } from 'vitest';
 import { Argon2Hasher } from './argon2.hasher';
 
 describe('Argon2Hasher (scrypt-backed)', () => {

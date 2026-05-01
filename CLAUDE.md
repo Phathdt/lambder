@@ -36,21 +36,21 @@ runs locally on LocalStack.
 
 ## Stack
 
-| Layer | Choice |
-|---|---|
-| Monorepo | pnpm workspaces + Turborepo |
-| Lang | TypeScript 5.6, Node 22 |
-| Backend HTTP | Hono + `hono/aws-lambda` |
-| ORM | Drizzle + node-postgres |
-| Auth | JWT EdDSA via jose, scrypt password hashing, Redis whitelist (revocable) |
-| Async | SQS + event source mapping, fire-and-forget enqueue, DLQ (`maxReceiveCount=3`), partial-batch failures |
-| Frontend | React 19 + Vite + Tailwind v4 + shadcn + react-hook-form + Zod (shared with BE via `@lambder/contracts`) + TanStack Query + axios |
-| Bundler | Rolldown (production Lambda bundles, ESM, 4–23 KB per function) |
-| Lint/Format | Oxlint + Prettier |
-| Logging | pino (JSON in Lambda, pino-pretty in dev), redacts password / authorization / tokens |
-| Test runners | Vitest (BE+FE unit/integration), Cucumber + Playwright (E2E BDD) |
-| LocalStack | `localstack/localstack:3.8` (community: REST API v1, Lambda, IAM, SQS) |
-| Deploy | Custom AWS SDK script (no Serverless license) |
+| Layer        | Choice                                                                                                                            |
+| ------------ | --------------------------------------------------------------------------------------------------------------------------------- |
+| Monorepo     | pnpm workspaces + Turborepo                                                                                                       |
+| Lang         | TypeScript 5.6, Node 22                                                                                                           |
+| Backend HTTP | Hono + `hono/aws-lambda`                                                                                                          |
+| ORM          | Drizzle + node-postgres                                                                                                           |
+| Auth         | JWT EdDSA via jose, scrypt password hashing, Redis whitelist (revocable)                                                          |
+| Async        | SQS + event source mapping, fire-and-forget enqueue, DLQ (`maxReceiveCount=3`), partial-batch failures                            |
+| Frontend     | React 19 + Vite + Tailwind v4 + shadcn + react-hook-form + Zod (shared with BE via `@lambder/contracts`) + TanStack Query + axios |
+| Bundler      | Rolldown (production Lambda bundles, ESM, 4–23 KB per function)                                                                   |
+| Lint/Format  | Oxlint + Prettier                                                                                                                 |
+| Logging      | pino (JSON in Lambda, pino-pretty in dev), redacts password / authorization / tokens                                              |
+| Test runners | Vitest (BE+FE unit/integration), Cucumber + Playwright (E2E BDD)                                                                  |
+| LocalStack   | `localstack/localstack:3.8` (community: REST API v1, Lambda, IAM, SQS)                                                            |
+| Deploy       | Custom AWS SDK script (no Serverless license)                                                                                     |
 
 ## Layout (Looper-style feature packages)
 
@@ -148,6 +148,7 @@ pnpm test:coverage:integration    # BE integration HTML → coverage/integration
 ### Test colocation (Go-style)
 
 Tests sit next to their source file:
+
 ```
 foo.ts + foo.test.ts             unit
 foo.ts + foo.integration.spec.ts integration
@@ -155,6 +156,7 @@ foo.ts + foo.integration.spec.ts integration
 
 Shared helpers/fakes live in sentinel directories that are excluded from
 both test discovery and coverage:
+
 - `__test-fakes__/` — in-memory port implementations
 - `__test-helpers__/` — Hono app builders for testcontainer-backed runs
 - `__test-utils__/` — RTL render helpers (FE)
@@ -191,15 +193,16 @@ features via `@lambder/<pkg>` workspace aliases.
 
 ## Deploy targets
 
-| Env | Gateway | DB | Cache | Queue |
-|---|---|---|---|---|
-| Dev (BE Hono :3001/:3002) | direct | host pg | host redis | local poller (`pnpm --filter email-worker dev`) |
-| Dev (LocalStack) | `http://localhost:4566/restapis/<id>/local/...` | host pg via `host.docker.internal` | host redis | LocalStack SQS + ESM |
-| Prod (AWS) | `https://<id>.execute-api.<region>.amazonaws.com` | RDS Postgres (consider RDS Proxy) | ElastiCache Redis | SQS + ESM (alarms on DLQ) |
+| Env                       | Gateway                                           | DB                                 | Cache             | Queue                                           |
+| ------------------------- | ------------------------------------------------- | ---------------------------------- | ----------------- | ----------------------------------------------- |
+| Dev (BE Hono :3001/:3002) | direct                                            | host pg                            | host redis        | local poller (`pnpm --filter email-worker dev`) |
+| Dev (LocalStack)          | `http://localhost:4566/restapis/<id>/local/...`   | host pg via `host.docker.internal` | host redis        | LocalStack SQS + ESM                            |
+| Prod (AWS)                | `https://<id>.execute-api.<region>.amazonaws.com` | RDS Postgres (consider RDS Proxy)  | ElastiCache Redis | SQS + ESM (alarms on DLQ)                       |
 
 ## Plan & reports
 
 Plans live under `plans/<date>-<slug>/`:
+
 ```
 plans/260430-clean-arch-lambda-monorepo/    Initial monorepo + auth + products
 ├── plan.md

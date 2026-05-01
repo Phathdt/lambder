@@ -112,9 +112,7 @@ interface QueueInfo {
 
 async function ensureQueues(): Promise<{ main: QueueInfo; dlq: QueueInfo }> {
   // 1) DLQ first — main queue's RedrivePolicy needs the DLQ ARN.
-  await sqs
-    .send(new CreateQueueCommand({ QueueName: EMAIL_DLQ_NAME }))
-    .catch(() => undefined);
+  await sqs.send(new CreateQueueCommand({ QueueName: EMAIL_DLQ_NAME })).catch(() => undefined);
   const dlqUrl = (await sqs.send(new GetQueueUrlCommand({ QueueName: EMAIL_DLQ_NAME }))).QueueUrl!;
   const dlqArn = (
     await sqs.send(
@@ -138,9 +136,8 @@ async function ensureQueues(): Promise<{ main: QueueInfo; dlq: QueueInfo }> {
       }),
     )
     .catch(() => undefined);
-  const mainUrl = (
-    await sqs.send(new GetQueueUrlCommand({ QueueName: EMAIL_QUEUE_NAME }))
-  ).QueueUrl!;
+  const mainUrl = (await sqs.send(new GetQueueUrlCommand({ QueueName: EMAIL_QUEUE_NAME })))
+    .QueueUrl!;
   const mainArn = (
     await sqs.send(
       new GetQueueAttributesCommand({ QueueUrl: mainUrl, AttributeNames: ['QueueArn'] }),
@@ -168,7 +165,9 @@ async function ensureEventSourceMapping(fnName: string, queueArn: string) {
   );
   for (const esm of existing.EventSourceMappings ?? []) {
     if (esm.UUID) {
-      await lambda.send(new DeleteEventSourceMappingCommand({ UUID: esm.UUID })).catch(() => undefined);
+      await lambda
+        .send(new DeleteEventSourceMappingCommand({ UUID: esm.UUID }))
+        .catch(() => undefined);
     }
   }
   await lambda.send(

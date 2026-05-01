@@ -192,19 +192,13 @@ describe('apiClient', () => {
         url: '/products',
       } as any;
 
-      const error = new AxiosError(
-        'Unauthorized',
-        'ERR_BAD_REQUEST',
-        originalConfig,
-        undefined,
-        {
-          status: 401,
-          statusText: 'Unauthorized',
-          data: {},
-          headers: {},
-          config: originalConfig,
-        } as any,
-      );
+      const error = new AxiosError('Unauthorized', 'ERR_BAD_REQUEST', originalConfig, undefined, {
+        status: 401,
+        statusText: 'Unauthorized',
+        data: {},
+        headers: {},
+        config: originalConfig,
+      } as any);
 
       const interceptor = apiClient.interceptors.response.handlers[0];
       const result = await interceptor.rejected(error);
@@ -223,9 +217,9 @@ describe('apiClient', () => {
       vi.mocked(tokenStorage.getRefresh).mockReturnValue('expired-refresh-token');
 
       // Mock failed refresh
-      const refreshSpy = vi.spyOn(axios, 'post').mockRejectedValueOnce(
-        new AxiosError('Invalid refresh token'),
-      );
+      const refreshSpy = vi
+        .spyOn(axios, 'post')
+        .mockRejectedValueOnce(new AxiosError('Invalid refresh token'));
 
       const originalConfig = {
         headers: axios.AxiosHeaders.from({}),
@@ -233,19 +227,13 @@ describe('apiClient', () => {
         url: '/products',
       } as any;
 
-      const error = new AxiosError(
-        'Unauthorized',
-        'ERR_BAD_REQUEST',
-        originalConfig,
-        undefined,
-        {
-          status: 401,
-          statusText: 'Unauthorized',
-          data: {},
-          headers: {},
-          config: originalConfig,
-        } as any,
-      );
+      const error = new AxiosError('Unauthorized', 'ERR_BAD_REQUEST', originalConfig, undefined, {
+        status: 401,
+        statusText: 'Unauthorized',
+        data: {},
+        headers: {},
+        config: originalConfig,
+      } as any);
 
       const interceptor = apiClient.interceptors.response.handlers[0];
       await expect(interceptor.rejected(error)).rejects.toThrow();
