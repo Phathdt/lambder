@@ -2,5 +2,5 @@
   "name": "@lambder/tsconfig",
   "version": "0.0.0",
   "private": true,
-  "files": ["base.json", "lib.json", "app.json"]
+  "files": ["base.json", "lib.json", "app.json", "react-app.json"]
 }

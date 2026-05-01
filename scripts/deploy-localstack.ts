@@ -1,30 +1,64 @@
-// Deploy auth-api + products-api to LocalStack as Lambda functions with
-// Function URLs. Uses pnpm deploy to produce flat node_modules per app, then
-// zips dist + node_modules into the Lambda artifact.
+// Deploy auth-api + products-api to LocalStack as Lambda functions behind a
+// single REST API Gateway (v1). The gateway routes path prefixes to the
+// matching Lambda — exactly like AWS API Gateway in production.
+//
+// Routes:
+//   /auth/{proxy+}      → lambder-auth-api Lambda
+//   /products/{proxy+}  → lambder-products-api Lambda
+//
+// Output: a single base URL the frontend can talk to.
 //
 // Pre-reqs: docker compose up -d, pnpm build, .env populated.
 
 import 'dotenv/config';
+import {
+  APIGatewayClient,
+  CreateDeploymentCommand,
+  CreateResourceCommand,
+  CreateRestApiCommand,
+  DeleteRestApiCommand,
+  GetResourcesCommand,
+  GetRestApisCommand,
+  PutIntegrationCommand,
+  PutMethodCommand,
+} from '@aws-sdk/client-api-gateway';
 import { CreateRoleCommand, GetRoleCommand, IAMClient } from '@aws-sdk/client-iam';
 import {
+  AddPermissionCommand,
   CreateFunctionCommand,
-  CreateFunctionUrlConfigCommand,
   DeleteFunctionCommand,
-  GetFunctionUrlConfigCommand,
+  GetFunctionCommand,
   LambdaClient,
 } from '@aws-sdk/client-lambda';
 import AdmZip from 'adm-zip';
 import { execSync } from 'node:child_process';
-import { existsSync, readdirSync, rmSync, statSync } from 'node:fs';
+import { existsSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
 
 const ENDPOINT = process.env.AWS_ENDPOINT_URL ?? 'http://localhost:4566';
 const REGION = process.env.AWS_REGION ?? 'ap-southeast-1';
+const ACCOUNT_ID = '000000000000';
 
 const lambda = new LambdaClient({ endpoint: ENDPOINT, region: REGION });
 const iam = new IAMClient({ endpoint: ENDPOINT, region: REGION });
+const apigw = new APIGatewayClient({ endpoint: ENDPOINT, region: REGION });
 
 const ROLE_NAME = 'lambder-lambda-role';
+const REST_API_NAME = 'lambder-gateway';
+const STAGE_NAME = 'local';
+
+interface AppSpec {
+  name: string;
+  fnName: string;
+  pathPrefix: string;
+}
+
+const APPS: AppSpec[] = [
+  { name: 'auth-api', fnName: 'lambder-auth-api', pathPrefix: 'auth' },
+  { name: 'products-api', fnName: 'lambder-products-api', pathPrefix: 'products' },
+];
+
+// --- IAM role ---------------------------------------------------------------
 
 async function ensureRole(): Promise<string> {
   try {
@@ -51,12 +85,8 @@ async function ensureRole(): Promise<string> {
   }
 }
 
-interface AppSpec {
-  name: string;
-  fnName: string;
-}
+// --- Lambda packaging -------------------------------------------------------
 
-// Recursively add a directory to a zip while preserving relative paths.
 const addDirToZip = (zip: AdmZip, root: string, dir: string) => {
   for (const entry of readdirSync(dir)) {
     if (entry === '.bin') continue;
@@ -75,9 +105,6 @@ const prepareDeployDir = (appName: string): string => {
   const target = resolve(process.cwd(), '.deploy', appName);
   if (existsSync(target)) rmSync(target, { recursive: true, force: true });
   console.log(`[pack] pnpm deploy ${appName} -> ${target}`);
-  // hoisted node-linker → flat node_modules without .pnpm/ symlinks (smaller zip).
-  // Install native binaries for the Lambda target (Linux arm64) regardless of
-  // the host arch by passing supported-architectures via env-style config.
   execSync(
     [
       'pnpm deploy',
@@ -96,7 +123,6 @@ const prepareDeployDir = (appName: string): string => {
 
 const buildZip = (deployDir: string, appName: string): Buffer => {
   const zip = new AdmZip();
-  // Mark as ESM (rolldown emits ESM into main.js).
   zip.addFile('package.json', Buffer.from(JSON.stringify({ type: 'module' })));
   const bundlePath = resolve(process.cwd(), 'dist/apps', appName, 'main.js');
   const sourcemap = `${bundlePath}.map`;
@@ -107,7 +133,7 @@ const buildZip = (deployDir: string, appName: string): Buffer => {
   return zip.toBuffer();
 };
 
-async function deployFunction(spec: AppSpec, roleArn: string): Promise<string> {
+async function deployLambda(spec: AppSpec, roleArn: string): Promise<string> {
   const Environment = {
     Variables: {
       DATABASE_URL: process.env.DATABASE_URL!.replace('localhost', 'host.docker.internal'),
@@ -144,45 +170,160 @@ async function deployFunction(spec: AppSpec, roleArn: string): Promise<string> {
       Architectures: ['arm64'],
     }),
   );
+  const { Configuration } = await lambda.send(
+    new GetFunctionCommand({ FunctionName: spec.fnName }),
+  );
   console.log(`[lambda] created ${spec.fnName}`);
-
-  let url: string;
-  try {
-    const cfg = await lambda.send(
-      new GetFunctionUrlConfigCommand({ FunctionName: spec.fnName }),
-    );
-    url = cfg.FunctionUrl!;
-  } catch {
-    const cfg = await lambda.send(
-      new CreateFunctionUrlConfigCommand({
-        FunctionName: spec.fnName,
-        AuthType: 'NONE',
-        InvokeMode: 'BUFFERED',
-      }),
-    );
-    url = cfg.FunctionUrl!;
-  }
-  return url;
+  return Configuration!.FunctionArn!;
 }
+
+// --- API Gateway v1 (REST API) ---------------------------------------------
+
+async function ensureFreshRestApi(): Promise<{ apiId: string; rootResourceId: string }> {
+  // Wipe any previous gateway with the same name to keep deploys idempotent.
+  const existing = await apigw.send(new GetRestApisCommand({}));
+  for (const api of existing.items ?? []) {
+    if (api.name === REST_API_NAME && api.id) {
+      await apigw.send(new DeleteRestApiCommand({ restApiId: api.id }));
+    }
+  }
+  const created = await apigw.send(
+    new CreateRestApiCommand({
+      name: REST_API_NAME,
+      endpointConfiguration: { types: ['REGIONAL'] },
+    }),
+  );
+  const apiId = created.id!;
+  const resources = await apigw.send(new GetResourcesCommand({ restApiId: apiId }));
+  const root = resources.items!.find((r) => r.path === '/');
+  return { apiId, rootResourceId: root!.id! };
+}
+
+async function createProxyResource(
+  apiId: string,
+  parentId: string,
+  pathPart: string,
+): Promise<string> {
+  // Create /<pathPart>
+  const base = await apigw.send(
+    new CreateResourceCommand({
+      restApiId: apiId,
+      parentId,
+      pathPart,
+    }),
+  );
+  // Create /<pathPart>/{proxy+}
+  const proxy = await apigw.send(
+    new CreateResourceCommand({
+      restApiId: apiId,
+      parentId: base.id!,
+      pathPart: '{proxy+}',
+    }),
+  );
+  return proxy.id!;
+}
+
+async function wireMethod(
+  apiId: string,
+  resourceId: string,
+  fnArn: string,
+  fnName: string,
+): Promise<void> {
+  await apigw.send(
+    new PutMethodCommand({
+      restApiId: apiId,
+      resourceId,
+      httpMethod: 'ANY',
+      authorizationType: 'NONE',
+      requestParameters: { 'method.request.path.proxy': true },
+    }),
+  );
+  await apigw.send(
+    new PutIntegrationCommand({
+      restApiId: apiId,
+      resourceId,
+      httpMethod: 'ANY',
+      type: 'AWS_PROXY',
+      integrationHttpMethod: 'POST',
+      uri: `arn:aws:apigateway:${REGION}:lambda:path/2015-03-31/functions/${fnArn}/invocations`,
+    }),
+  );
+  // Allow API Gateway to invoke the Lambda.
+  await lambda
+    .send(
+      new AddPermissionCommand({
+        FunctionName: fnName,
+        StatementId: `apigw-invoke-${resourceId}`,
+        Action: 'lambda:InvokeFunction',
+        Principal: 'apigateway.amazonaws.com',
+        SourceArn: `arn:aws:execute-api:${REGION}:${ACCOUNT_ID}:${apiId}/*/*`,
+      }),
+    )
+    .catch(() => {
+      /* permission may already exist */
+    });
+}
+
+// Some Lambda routes (auth /signup, /login, /refresh) live at the prefix root
+// (no further path segment). API Gateway's {proxy+} only matches one or more
+// segments, so we also wire ANY on the /<prefix> resource itself.
+async function wireRootAndProxy(
+  apiId: string,
+  parentId: string,
+  pathPart: string,
+  fnArn: string,
+  fnName: string,
+): Promise<void> {
+  const base = await apigw.send(
+    new CreateResourceCommand({ restApiId: apiId, parentId, pathPart }),
+  );
+  // ANY on /<pathPart>
+  await wireMethod(apiId, base.id!, fnArn, fnName);
+
+  const proxy = await apigw.send(
+    new CreateResourceCommand({
+      restApiId: apiId,
+      parentId: base.id!,
+      pathPart: '{proxy+}',
+    }),
+  );
+  // ANY on /<pathPart>/{proxy+}
+  await wireMethod(apiId, proxy.id!, fnArn, fnName);
+}
+
+// --- Main -------------------------------------------------------------------
 
 async function main() {
   const roleArn = await ensureRole();
   console.log('[iam] role:', roleArn);
 
-  const apps: AppSpec[] = [
-    { name: 'auth-api', fnName: 'lambder-auth-api' },
-    { name: 'products-api', fnName: 'lambder-products-api' },
-  ];
+  const lambdaArns: Record<string, string> = {};
+  for (const app of APPS) lambdaArns[app.name] = await deployLambda(app, roleArn);
 
-  const urls: { name: string; url: string }[] = [];
-  for (const app of apps) {
-    const url = await deployFunction(app, roleArn);
-    const localUrl = url.replace(/^https:\/\/[^/]+/, ENDPOINT);
-    urls.push({ name: app.name, url: localUrl });
+  console.log('[apigw] creating REST API');
+  const { apiId, rootResourceId } = await ensureFreshRestApi();
+
+  for (const app of APPS) {
+    await wireRootAndProxy(
+      apiId,
+      rootResourceId,
+      app.pathPrefix,
+      lambdaArns[app.name]!,
+      app.fnName,
+    );
+    console.log(`[apigw] wired /${app.pathPrefix}/* → ${app.fnName}`);
   }
 
+  await apigw.send(new CreateDeploymentCommand({ restApiId: apiId, stageName: STAGE_NAME }));
+  const baseUrl = `${ENDPOINT}/restapis/${apiId}/${STAGE_NAME}/_user_request_`;
+
+  // Drop the URL into apps/web/.env.local for the frontend to pick up.
+  const webEnv = resolve(process.cwd(), 'apps/web/.env.local');
+  writeFileSync(webEnv, `VITE_API_BASE_URL=${baseUrl}\n`);
+
   console.log('\n✓ Deploy complete');
-  for (const { name, url } of urls) console.log(`   ${name}: ${url}`);
+  console.log(`   gateway: ${baseUrl}`);
+  console.log(`   wrote ${webEnv}`);
 }
 
 main().catch((e) => {
