@@ -14,7 +14,7 @@ export const buildAuthApp = (auth?: AuthModule, logger?: Logger) => {
   const log =
     logger ??
     createLogger({ service: 'auth-api', pretty: process.env.NODE_ENV !== 'production' });
-  /* c8 ignore next 14 */
+  /* c8 ignore next 22 */
   const module =
     auth ??
     buildAuthModule(
@@ -27,6 +27,12 @@ export const buildAuthApp = (auth?: AuthModule, logger?: Logger) => {
         refreshTtlSeconds: env.JWT_REFRESH_TTL,
         issuer: env.JWT_ISSUER,
         audience: env.JWT_AUDIENCE,
+        email: {
+          queueUrl: env.EMAIL_QUEUE_URL,
+          region: env.AWS_REGION,
+          ...(env.AWS_ENDPOINT_URL ? { endpoint: env.AWS_ENDPOINT_URL } : {}),
+        },
+        logger: log,
       }))(loadConfig()),
     );
 

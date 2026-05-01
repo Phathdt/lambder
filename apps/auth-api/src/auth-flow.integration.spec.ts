@@ -11,18 +11,18 @@ import { buildTestAuthApp } from './__test-helpers__/build-test-app';
 describe('auth-api integration: signup → login → logout → refresh', () => {
   let pg: StartedPostgres;
   let redis: StartedRedis;
-  let app: ReturnType<typeof buildTestAuthApp>;
+  let app: ReturnType<typeof buildTestAuthApp>['app'];
 
   beforeAll(async () => {
     pg = await startPostgres();
     redis = await startRedis();
     const keys = await generateTestJwtKeys();
-    app = buildTestAuthApp({
+    ({ app } = buildTestAuthApp({
       databaseUrl: pg.url,
       redisUrl: redis.url,
       jwtPrivateKeyPem: keys.privateKeyPem,
       jwtPublicKeyPem: keys.publicKeyPem,
-    });
+    }));
   });
 
   afterAll(async () => {

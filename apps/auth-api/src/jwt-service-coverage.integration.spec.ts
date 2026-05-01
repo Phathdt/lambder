@@ -26,7 +26,7 @@ describe('jose-jwt.service integration: issuer/audience verification', () => {
     const keys = await generateTestJwtKeys();
 
     // Sign with one issuer
-    const app1 = buildTestAuthApp({
+    const { app: app1 } = buildTestAuthApp({
       databaseUrl: pg.url,
       redisUrl: redis.url,
       jwtPrivateKeyPem: keys.privateKeyPem,
@@ -50,7 +50,7 @@ describe('jose-jwt.service integration: issuer/audience verification', () => {
     const { accessToken } = await loginRes.json();
 
     // App with different issuer cannot verify the token
-    const app2 = buildTestAuthApp({
+    const { app: app2 } = buildTestAuthApp({
       databaseUrl: pg.url,
       redisUrl: redis.url,
       jwtPrivateKeyPem: keys.privateKeyPem,
@@ -69,7 +69,7 @@ describe('jose-jwt.service integration: issuer/audience verification', () => {
   test('token signed with audience cannot be verified with different audience', async () => {
     const keys = await generateTestJwtKeys();
 
-    const app1 = buildTestAuthApp({
+    const { app: app1 } = buildTestAuthApp({
       databaseUrl: pg.url,
       redisUrl: redis.url,
       jwtPrivateKeyPem: keys.privateKeyPem,
@@ -93,7 +93,7 @@ describe('jose-jwt.service integration: issuer/audience verification', () => {
     const { accessToken } = await loginRes.json();
 
     // App with different audience cannot verify
-    const app2 = buildTestAuthApp({
+    const { app: app2 } = buildTestAuthApp({
       databaseUrl: pg.url,
       redisUrl: redis.url,
       jwtPrivateKeyPem: keys.privateKeyPem,
@@ -112,7 +112,7 @@ describe('jose-jwt.service integration: issuer/audience verification', () => {
   test('sign without issuer/audience config works', async () => {
     const keys = await generateTestJwtKeys();
 
-    const app = buildTestAuthApp({
+    const { app: app } = buildTestAuthApp({
       databaseUrl: pg.url,
       redisUrl: redis.url,
       jwtPrivateKeyPem: keys.privateKeyPem,
@@ -148,7 +148,7 @@ describe('jose-jwt.service integration: issuer/audience verification', () => {
 
   test('verify rejects malformed tokens', async () => {
     const keys = await generateTestJwtKeys();
-    const app = buildTestAuthApp({
+    const { app: app } = buildTestAuthApp({
       databaseUrl: pg.url,
       redisUrl: redis.url,
       jwtPrivateKeyPem: keys.privateKeyPem,
@@ -166,7 +166,7 @@ describe('jose-jwt.service integration: issuer/audience verification', () => {
     const keys = await generateTestJwtKeys();
 
     // Signup and login with app that has NO issuer
-    const app = buildTestAuthApp({
+    const { app: app } = buildTestAuthApp({
       databaseUrl: pg.url,
       redisUrl: redis.url,
       jwtPrivateKeyPem: keys.privateKeyPem,
@@ -202,7 +202,7 @@ describe('jose-jwt.service integration: issuer/audience verification', () => {
   test('can sign and verify token without audience configured', async () => {
     const keys = await generateTestJwtKeys();
 
-    const app = buildTestAuthApp({
+    const { app: app } = buildTestAuthApp({
       databaseUrl: pg.url,
       redisUrl: redis.url,
       jwtPrivateKeyPem: keys.privateKeyPem,
@@ -237,7 +237,7 @@ describe('jose-jwt.service integration: issuer/audience verification', () => {
   test('can sign and verify token with both issuer and audience configured', async () => {
     const keys = await generateTestJwtKeys();
 
-    const app = buildTestAuthApp({
+    const { app: app } = buildTestAuthApp({
       databaseUrl: pg.url,
       redisUrl: redis.url,
       jwtPrivateKeyPem: keys.privateKeyPem,

@@ -5,12 +5,14 @@ import { defineConfig } from 'vitest/config';
 // and are excluded here (loaded by vitest.integration.config.ts instead).
 export default defineConfig({
   test: {
-    include: ['packages/**/src/**/*.test.ts'],
+    include: ['packages/**/src/**/*.test.ts', 'apps/**/src/**/*.test.ts'],
+    // apps/web has its own vitest.config.ts (jsdom + RTL); skip its tests here.
     exclude: [
       '**/node_modules/**',
       '**/dist/**',
       '**/*.integration.spec.ts',
       '**/__test-fakes__/**',
+      'apps/web/**',
     ],
     pool: 'threads',
     poolOptions: { threads: { maxThreads: 8, minThreads: 2 } },
@@ -26,6 +28,11 @@ export default defineConfig({
         'packages/products/src/domain/**/*.ts',
         'packages/shared-kernel/src/**/*.ts',
         'packages/auth/src/infrastructure/crypto/argon2.hasher.ts',
+        'packages/email/src/application/**/*.ts',
+        'packages/email/src/domain/**/*.ts',
+        'packages/email/src/infrastructure/providers/**/*.ts',
+        'packages/email/src/infrastructure/enqueuers/**/*.ts',
+        'apps/email-worker/src/app.ts',
       ],
       exclude: [
         '**/index.ts',

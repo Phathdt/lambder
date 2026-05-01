@@ -1,5 +1,6 @@
-import { isErr, isOk } from '@lambder/shared-kernel';
-import { beforeEach, describe, expect, test } from 'vitest';
+import { createInMemoryEmailEnqueuer, type InMemoryEmailEnqueuer } from '@lambder/email/test-fakes';
+import { isErr, isOk, type Logger } from '@lambder/shared-kernel';
+import { beforeEach, describe, expect, test, vi } from 'vitest';
 import {
   createFakeHasher,
   createFakeJwtService,
@@ -11,16 +12,26 @@ import {
 } from '../../__test-fakes__/fakes';
 import { AuthService } from './auth.service';
 
-const buildService = () => {
+const stubLogger = (): Logger =>
+  ({ error: vi.fn(), info: vi.fn(), warn: vi.fn(), debug: vi.fn(), trace: vi.fn(), fatal: vi.fn(), child: vi.fn() } as unknown as Logger);
+
+const buildService = (overrides: { emailEnqueuer?: InMemoryEmailEnqueuer; logger?: Logger } = {}) => {
   const users = createFakeUserRepository();
   const hasher = createFakeHasher();
   const jwt = createFakeJwtService();
   const tokens = createFakeTokenStore();
-  const service = new AuthService(users, hasher, jwt, tokens, {
-    accessTtlSeconds: 900,
-    refreshTtlSeconds: 604_800,
-  });
-  return { service, users, jwt, tokens };
+  const emailEnqueuer = overrides.emailEnqueuer ?? createInMemoryEmailEnqueuer();
+  const logger = overrides.logger;
+  const service = new AuthService(
+    users,
+    hasher,
+    jwt,
+    tokens,
+    emailEnqueuer,
+    { accessTtlSeconds: 900, refreshTtlSeconds: 604_800 },
+    logger,
+  );
+  return { service, users, jwt, tokens, emailEnqueuer, logger };
 };
 
 describe('AuthService.signup', () => {
@@ -46,6 +57,40 @@ describe('AuthService.signup', () => {
     const { service, users } = buildService();
     await service.signup({ email: 'x@y.com', password: 'StrongPass1!' });
     expect(users.users.get('x@y.com')?.passwordHash).toBe('hash(StrongPass1!)');
+  });
+
+  test('enqueues a welcome email after successful signup', async () => {
+    const { service, emailEnqueuer } = buildService();
+    const result = await service.signup({ email: 'q@r.com', password: 'StrongPass1!' });
+    expect(isOk(result)).toBe(true);
+    expect(emailEnqueuer.calls).toHaveLength(1);
+    expect(emailEnqueuer.calls[0]).toMatchObject({ email: 'q@r.com' });
+    if (isOk(result)) expect(emailEnqueuer.calls[0]?.userId).toBe(result.value.id);
+  });
+
+  test('swallows enqueue failures and still returns ok (signup is critical, email is best-effort)', async () => {
+    const emailEnqueuer = createInMemoryEmailEnqueuer();
+    emailEnqueuer.failNext('SQS down');
+    const logger = stubLogger();
+    const { service } = buildService({ emailEnqueuer, logger });
+
+    const result = await service.signup({ email: 'fail@x.com', password: 'StrongPass1!' });
+
+    expect(isOk(result)).toBe(true);
+    expect(emailEnqueuer.calls).toHaveLength(0);
+    expect(logger.error).toHaveBeenCalledWith(
+      expect.objectContaining({ err: expect.any(Error) }),
+      'welcome-email.enqueue-failed',
+    );
+  });
+
+  test('does not enqueue when signup is rejected (duplicate email)', async () => {
+    const { service, emailEnqueuer } = buildService();
+    await service.signup({ email: 'dup@a.com', password: 'StrongPass1!' });
+    emailEnqueuer.calls.length = 0;
+    const result = await service.signup({ email: 'dup@a.com', password: 'StrongPass1!' });
+    expect(isErr(result)).toBe(true);
+    expect(emailEnqueuer.calls).toHaveLength(0);
   });
 });
 

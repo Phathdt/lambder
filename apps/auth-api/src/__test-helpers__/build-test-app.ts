@@ -1,4 +1,5 @@
 import { buildAuthModule } from '@lambder/auth/module';
+import { createInMemoryEmailEnqueuer, type InMemoryEmailEnqueuer } from '@lambder/email/test-fakes';
 import { createLogger } from '@lambder/shared-kernel';
 import { buildAuthApp } from '../app';
 
@@ -14,9 +15,16 @@ export interface TestAppEnv {
   audience?: string;
 }
 
+export interface TestAppHandle {
+  app: ReturnType<typeof buildAuthApp>;
+  emailEnqueuer: InMemoryEmailEnqueuer;
+}
+
 // Builds a Hono app wired against testcontainer-backed infra. Uses short
 // TTLs so token-expiry behaviour is observable inside reasonable test runs.
-export const buildTestAuthApp = (env: TestAppEnv) => {
+// Returns the in-memory email enqueuer so tests can assert side-effects.
+export const buildTestAuthApp = (env: TestAppEnv): TestAppHandle => {
+  const emailEnqueuer = createInMemoryEmailEnqueuer();
   const auth = buildAuthModule({
     databaseUrl: env.databaseUrl,
     redisUrl: env.redisUrl,
@@ -26,6 +34,7 @@ export const buildTestAuthApp = (env: TestAppEnv) => {
     refreshTtlSeconds: 600,
     issuer: env.issuer ?? 'lambder-test',
     audience: env.audience ?? 'lambder-test.api',
+    emailEnqueuer,
   });
-  return buildAuthApp(auth, silentLogger);
+  return { app: buildAuthApp(auth, silentLogger), emailEnqueuer };
 };

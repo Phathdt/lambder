@@ -1,4 +1,5 @@
 import { buildAuthModule } from '@lambder/auth/module';
+import { createInMemoryEmailEnqueuer } from '@lambder/email/test-fakes';
 import {
   generateTestJwtKeys,
   startPostgres,
@@ -44,6 +45,7 @@ describe('products-api integration: CRUD with JWT auth', () => {
       refreshTtlSeconds: 600,
       issuer: 'lambder-test',
       audience: 'lambder-test.api',
+      emailEnqueuer: createInMemoryEmailEnqueuer(),
     });
     app = buildTestProductsApp({
       databaseUrl: pg.url,

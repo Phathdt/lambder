@@ -11,18 +11,18 @@ import { buildTestAuthApp } from './__test-helpers__/build-test-app';
 describe('auth-api: error-mapper & jwt-auth branch coverage', () => {
   let pg: StartedPostgres;
   let redis: StartedRedis;
-  let app: ReturnType<typeof buildTestAuthApp>;
+  let app: ReturnType<typeof buildTestAuthApp>['app'];
 
   beforeAll(async () => {
     pg = await startPostgres();
     redis = await startRedis();
     const keys = await generateTestJwtKeys();
-    app = buildTestAuthApp({
+    ({ app } = buildTestAuthApp({
       databaseUrl: pg.url,
       redisUrl: redis.url,
       jwtPrivateKeyPem: keys.privateKeyPem,
       jwtPublicKeyPem: keys.publicKeyPem,
-    });
+    }));
   });
 
   afterAll(async () => {
@@ -79,7 +79,7 @@ describe('auth-api: error-mapper & jwt-auth branch coverage', () => {
   test('jwt-auth: different public key rejects token (signature mismatch)', async () => {
     // Create a token with one set of keys
     const keys1 = await generateTestJwtKeys();
-    const app1 = buildTestAuthApp({
+    const { app: app1 } = buildTestAuthApp({
       databaseUrl: pg.url,
       redisUrl: redis.url,
       jwtPrivateKeyPem: keys1.privateKeyPem,
@@ -104,7 +104,7 @@ describe('auth-api: error-mapper & jwt-auth branch coverage', () => {
 
     // Create app with different keys
     const keys2 = await generateTestJwtKeys();
-    const app2 = buildTestAuthApp({
+    const { app: app2 } = buildTestAuthApp({
       databaseUrl: pg.url,
       redisUrl: redis.url,
       jwtPrivateKeyPem: keys2.privateKeyPem,
@@ -124,7 +124,7 @@ describe('auth-api: error-mapper & jwt-auth branch coverage', () => {
   test('jwt-auth: malformed jwt (invalid signature) returns 401 INVALID_TOKEN', async () => {
     const keys = await generateTestJwtKeys();
     // Create a token with the app's key, then verify with different key
-    const app1 = buildTestAuthApp({
+    const { app: app1 } = buildTestAuthApp({
       databaseUrl: pg.url,
       redisUrl: redis.url,
       jwtPrivateKeyPem: keys.privateKeyPem,
@@ -149,7 +149,7 @@ describe('auth-api: error-mapper & jwt-auth branch coverage', () => {
 
     // Create app with different key
     const keys2 = await generateTestJwtKeys();
-    const app2 = buildTestAuthApp({
+    const { app: app2 } = buildTestAuthApp({
       databaseUrl: pg.url,
       redisUrl: redis.url,
       jwtPrivateKeyPem: keys2.privateKeyPem,

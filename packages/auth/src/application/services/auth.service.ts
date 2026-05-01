@@ -1,6 +1,8 @@
+import type { EmailEnqueuer } from '@lambder/email';
 import {
   AuthError,
   ConflictError,
+  type Logger,
   type Result,
   err,
   ok,
@@ -35,7 +37,9 @@ export class AuthService implements AuthServiceContract {
     private readonly hasher: Hasher,
     private readonly jwt: JwtService,
     private readonly tokens: TokenStore,
+    private readonly emailEnqueuer: EmailEnqueuer,
     private readonly config: AuthServiceConfig,
+    private readonly logger?: Logger,
   ) {}
 
   async signup(input: SignupInput): Promise<Result<PublicUser, ConflictError>> {
@@ -43,6 +47,18 @@ export class AuthService implements AuthServiceContract {
     if (await this.users.findByEmail(email)) return err(emailTaken());
     const passwordHash = await this.hasher.hash(input.password);
     const user = await this.users.create({ email, passwordHash });
+
+    // Fire-and-forget welcome email. SQS / provider outages must NEVER 5xx
+    // a signup. Failures are surfaced via structured logs for ops alerting.
+    try {
+      await this.emailEnqueuer.enqueueWelcome({ userId: user.id, email: user.email });
+    } catch (error) {
+      this.logger?.error(
+        { err: error, userId: user.id },
+        'welcome-email.enqueue-failed',
+      );
+    }
+
     return ok(toPublicUser(user));
   }
 

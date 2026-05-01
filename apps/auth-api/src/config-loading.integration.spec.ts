@@ -8,6 +8,7 @@ describe('auth-api: config loading', () => {
       REDIS_URL: 'redis://localhost:6379',
       JWT_PRIVATE_KEY_PEM: '-----BEGIN RSA PRIVATE KEY-----\nkey\n-----END RSA PRIVATE KEY-----',
       JWT_PUBLIC_KEY_PEM: '-----BEGIN PUBLIC KEY-----\nkey\n-----END PUBLIC KEY-----',
+      EMAIL_QUEUE_URL: 'http://localhost:4566/000000000000/test-q',
       JWT_ACCESS_TTL: '900',
       JWT_REFRESH_TTL: '604800',
       JWT_ISSUER: 'test',
@@ -25,6 +26,7 @@ describe('auth-api: config loading', () => {
       REDIS_URL: 'redis://localhost:6379',
       JWT_PRIVATE_KEY_PEM: '-----BEGIN RSA PRIVATE KEY-----\nkey\n-----END RSA PRIVATE KEY-----',
       JWT_PUBLIC_KEY_PEM: '-----BEGIN PUBLIC KEY-----\nkey\n-----END PUBLIC KEY-----',
+      EMAIL_QUEUE_URL: 'http://localhost:4566/000000000000/test-q',
     };
     expect(() => loadConfig(invalidEnv)).toThrow();
   });
@@ -35,6 +37,7 @@ describe('auth-api: config loading', () => {
       REDIS_URL: 'redis://localhost:6379',
       JWT_PRIVATE_KEY_PEM: '-----BEGIN RSA PRIVATE KEY-----\nkey\n-----END RSA PRIVATE KEY-----',
       JWT_PUBLIC_KEY_PEM: '-----BEGIN PUBLIC KEY-----\nkey\n-----END PUBLIC KEY-----',
+      EMAIL_QUEUE_URL: 'http://localhost:4566/000000000000/test-q',
     };
     expect(() => loadConfig(invalidEnv)).toThrow();
   });
@@ -45,6 +48,7 @@ describe('auth-api: config loading', () => {
       REDIS_URL: 'redis://localhost:6379',
       JWT_PRIVATE_KEY_PEM: '',
       JWT_PUBLIC_KEY_PEM: '-----BEGIN PUBLIC KEY-----\nkey\n-----END PUBLIC KEY-----',
+      EMAIL_QUEUE_URL: 'http://localhost:4566/000000000000/test-q',
     };
     expect(() => loadConfig(invalidEnv)).toThrow();
   });
@@ -54,6 +58,7 @@ describe('auth-api: config loading', () => {
       DATABASE_URL: 'postgresql://localhost/test',
       JWT_PRIVATE_KEY_PEM: '-----BEGIN RSA PRIVATE KEY-----\nkey\n-----END RSA PRIVATE KEY-----',
       JWT_PUBLIC_KEY_PEM: '-----BEGIN PUBLIC KEY-----\nkey\n-----END PUBLIC KEY-----',
+      EMAIL_QUEUE_URL: 'http://localhost:4566/000000000000/test-q',
     };
     expect(() => loadConfig(invalidEnv)).toThrow();
   });
@@ -64,6 +69,7 @@ describe('auth-api: config loading', () => {
       REDIS_URL: 'redis://localhost:6379',
       JWT_PRIVATE_KEY_PEM: '-----BEGIN RSA PRIVATE KEY-----\nkey\n-----END RSA PRIVATE KEY-----',
       JWT_PUBLIC_KEY_PEM: '-----BEGIN PUBLIC KEY-----\nkey\n-----END PUBLIC KEY-----',
+      EMAIL_QUEUE_URL: 'http://localhost:4566/000000000000/test-q',
     };
     const config = loadConfig(validEnv);
     expect(config.JWT_ACCESS_TTL).toBe(900);
@@ -75,6 +81,7 @@ describe('auth-api: config loading', () => {
       REDIS_URL: 'redis://localhost:6379',
       JWT_PRIVATE_KEY_PEM: '-----BEGIN RSA PRIVATE KEY-----\nkey\n-----END RSA PRIVATE KEY-----',
       JWT_PUBLIC_KEY_PEM: '-----BEGIN PUBLIC KEY-----\nkey\n-----END PUBLIC KEY-----',
+      EMAIL_QUEUE_URL: 'http://localhost:4566/000000000000/test-q',
     };
     const config = loadConfig(validEnv);
     expect(config.JWT_ISSUER).toBe('lambder');
@@ -86,6 +93,7 @@ describe('auth-api: config loading', () => {
       REDIS_URL: 'redis://localhost:6379',
       JWT_PRIVATE_KEY_PEM: '-----BEGIN RSA PRIVATE KEY-----\nkey\n-----END RSA PRIVATE KEY-----',
       JWT_PUBLIC_KEY_PEM: '-----BEGIN PUBLIC KEY-----\nkey\n-----END PUBLIC KEY-----',
+      EMAIL_QUEUE_URL: 'http://localhost:4566/000000000000/test-q',
       JWT_ISSUER: 'custom-issuer',
     };
     const config = loadConfig(validEnv);

@@ -9,6 +9,11 @@ const envSchema = z.object({
   JWT_REFRESH_TTL: z.coerce.number().int().positive().default(604800),
   JWT_ISSUER: z.string().default('lambder'),
   JWT_AUDIENCE: z.string().default('lambder.api'),
+  // SQS queue auth-api publishes welcome-email jobs to. In dev we read from
+  // .env (set by `pnpm deploy:local`); in prod from SSM-injected env vars.
+  EMAIL_QUEUE_URL: z.string().url(),
+  AWS_ENDPOINT_URL: z.string().url().optional(),
+  AWS_REGION: z.string().default('ap-southeast-1'),
 });
 
 export type AuthApiEnv = z.infer<typeof envSchema>;

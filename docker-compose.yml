@@ -38,7 +38,7 @@ services:
     ports:
       - "127.0.0.1:4566:4566"
     environment:
-      SERVICES: lambda,apigateway,iam,logs,cloudformation,sts,s3,ssm
+      SERVICES: lambda,apigateway,iam,logs,cloudformation,sts,s3,ssm,sqs
       DEFAULT_REGION: ap-southeast-1
       LAMBDA_EXECUTOR: docker
       LAMBDA_DOCKER_NETWORK: lambder-dev_default
