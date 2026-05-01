@@ -10,9 +10,11 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     globals: true,
-    setupFiles: ['./test/setup.ts'],
-    include: ['test/**/*.test.{ts,tsx}', 'src/**/*.test.{ts,tsx}'],
-    exclude: ['node_modules', 'dist', '.turbo'],
+    pool: 'threads',
+    poolOptions: { threads: { maxThreads: 8, minThreads: 2 } },
+    setupFiles: ['./src/__test-utils__/setup.ts'],
+    include: ['src/**/*.test.{ts,tsx}'],
+    exclude: ['node_modules', 'dist', '.turbo', '**/__test-utils__/**'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'text-summary', 'html', 'lcov', 'json-summary'],
@@ -25,6 +27,8 @@ export default defineConfig({
       exclude: [
         '**/*.d.ts',
         '**/index.ts',
+        '**/*.test.{ts,tsx}',
+        '**/__test-utils__/**',
         // shadcn primitives are presentational wrappers
         'src/components/ui/**',
         // pages are exercised by E2E

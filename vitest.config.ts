@@ -1,20 +1,19 @@
 import { defineConfig } from 'vitest/config';
 
-// Unit-only config (excludes *.integration.spec.ts).
-//
-// Coverage scope: only the layers we exercise with unit tests live here.
-// Infrastructure (drizzle repos, schemas, db pool, redis client, JWT service)
-// is covered by integration tests instead. Contracts are declarative Zod
-// schemas — coverage isn't meaningful and they're exercised end-to-end by
-// FE/integration tests anyway.
+// Go-style colocation: each src file's test sits next to it as `*.test.ts`.
+// Integration specs live next to their feature target as `*.integration.spec.ts`
+// and are excluded here (loaded by vitest.integration.config.ts instead).
 export default defineConfig({
   test: {
-    include: [
-      'packages/**/test/**/*.test.ts',
-      'packages/**/test/**/*.spec.ts',
+    include: ['packages/**/src/**/*.test.ts'],
+    exclude: [
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/*.integration.spec.ts',
+      '**/__test-fakes__/**',
     ],
-    exclude: ['**/node_modules/**', '**/dist/**', '**/*.integration.spec.ts'],
     pool: 'threads',
+    poolOptions: { threads: { maxThreads: 8, minThreads: 2 } },
     environment: 'node',
     coverage: {
       provider: 'v8',
@@ -32,12 +31,14 @@ export default defineConfig({
         '**/index.ts',
         '**/*.d.ts',
         '**/*.module.ts',
+        '**/*.test.ts',
         '**/migrations/**',
         '**/types.ts',
-        // Pure interface files — no executable code to cover.
+        '**/__test-fakes__/**',
+        '**/__test-helpers__/**',
         '**/interfaces/**',
       ],
-      thresholds: { lines: 80, functions: 80, branches: 75 },
+      thresholds: { lines: 95, functions: 95, branches: 95 },
     },
   },
 });
