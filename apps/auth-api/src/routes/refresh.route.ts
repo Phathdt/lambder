@@ -13,7 +13,7 @@ export const refreshRoute = (auth: AuthModule) => {
     } catch (e) {
       return mapError(e, c);
     }
-    const result = await auth.refresh.execute(body);
+    const result = await auth.authService.refresh(body);
     if (isErr(result)) return mapError(result.error, c);
     return c.json(result.value, 200);
   });

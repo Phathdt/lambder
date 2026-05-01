@@ -24,9 +24,9 @@ describe('products-api integration: CRUD with JWT auth', () => {
   // a second Hono app for the integration scope).
   async function provisionUser(email: string): Promise<{ userId: string; tokens: Tokens }> {
     const password = 'StrongPass1!@#';
-    const signupRes = await auth.signup.execute({ email, password });
+    const signupRes = await auth.authService.signup({ email, password });
     if (!signupRes.ok) throw new Error('signup failed: ' + signupRes.error.message);
-    const loginRes = await auth.login.execute({ email, password });
+    const loginRes = await auth.authService.login({ email, password });
     if (!loginRes.ok) throw new Error('login failed: ' + loginRes.error.message);
     return { userId: signupRes.value.id, tokens: loginRes.value };
   }

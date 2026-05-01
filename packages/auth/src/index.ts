@@ -3,11 +3,16 @@ export * from './domain/interfaces/user.repository';
 export * from './domain/interfaces/token-store';
 export * from './domain/interfaces/hasher';
 export * from './domain/interfaces/jwt-service';
+export type {
+  AuthService as AuthServiceContract,
+  LoginInput,
+  LogoutInput,
+  RefreshInput,
+  SignupInput,
+  TokenPair,
+} from './domain/interfaces/auth.service';
 export * from './domain/errors';
-export * from './application/services/signup.service';
-export * from './application/services/login.service';
-export * from './application/services/logout.service';
-export * from './application/services/refresh.service';
+export * from './application/services/auth.service';
 export * from './infrastructure/crypto/argon2.hasher';
 export * from './infrastructure/crypto/jose-jwt.service';
 export * from './infrastructure/cache/redis-token.store';

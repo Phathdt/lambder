@@ -13,7 +13,7 @@ export const loginRoute = (auth: AuthModule) => {
     } catch (e) {
       return mapError(e, c);
     }
-    const result = await auth.login.execute(body);
+    const result = await auth.authService.login(body);
     if (isErr(result)) return mapError(result.error, c);
     return c.json(result.value, 200);
   });

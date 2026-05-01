@@ -14,4 +14,9 @@ export interface NewUser {
   readonly passwordHash: string;
 }
 
-export const toPublicUser = (u: User) => ({ id: u.id, email: u.email });
+export interface PublicUser {
+  readonly id: string;
+  readonly email: string;
+}
+
+export const toPublicUser = (u: User): PublicUser => ({ id: u.id, email: u.email });

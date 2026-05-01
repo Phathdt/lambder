@@ -13,7 +13,7 @@ export const signupRoute = (auth: AuthModule) => {
     } catch (e) {
       return mapError(e, c);
     }
-    const result = await auth.signup.execute(body);
+    const result = await auth.authService.signup(body);
     if (isErr(result)) return mapError(result.error, c);
     return c.json({ user: result.value }, 201);
   });

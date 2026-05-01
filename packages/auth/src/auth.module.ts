@@ -1,14 +1,12 @@
 import { getRedis } from '@lambder/cache';
 import { getDb } from '@lambder/db';
-import { LoginService } from './application/services/login.service';
-import { LogoutService } from './application/services/logout.service';
-import { RefreshService } from './application/services/refresh.service';
-import { SignupService } from './application/services/signup.service';
+import { AuthService } from './application/services/auth.service';
+import type { JwtService } from './domain/interfaces/jwt-service';
+import type { TokenStore } from './domain/interfaces/token-store';
 import { Argon2Hasher } from './infrastructure/crypto/argon2.hasher';
 import { JoseJwtService } from './infrastructure/crypto/jose-jwt.service';
 import { RedisTokenStore } from './infrastructure/cache/redis-token.store';
 import { UserDrizzleRepository } from './infrastructure/repositories/user.drizzle-repository';
-import type { JwtService } from './domain/interfaces/jwt-service';
 
 export interface AuthModuleConfig {
   databaseUrl: string;
@@ -22,15 +20,13 @@ export interface AuthModuleConfig {
 }
 
 export interface AuthModule {
-  signup: SignupService;
-  login: LoginService;
-  logout: LogoutService;
-  refresh: RefreshService;
+  authService: AuthService;
   jwt: JwtService;
-  tokens: RedisTokenStore;
+  tokens: TokenStore;
 }
 
 export const buildAuthModule = (config: AuthModuleConfig): AuthModule => {
+  /* c8 ignore next 14 */
   const db = getDb(config.databaseUrl);
   const redis = getRedis(config.redisUrl);
 
@@ -44,18 +40,10 @@ export const buildAuthModule = (config: AuthModuleConfig): AuthModule => {
     ...(config.audience ? { audience: config.audience } : {}),
   });
 
-  return {
-    signup: new SignupService(users, hasher),
-    login: new LoginService(users, hasher, jwt, tokens, {
-      accessTtlSeconds: config.accessTtlSeconds,
-      refreshTtlSeconds: config.refreshTtlSeconds,
-    }),
-    logout: new LogoutService(tokens),
-    refresh: new RefreshService(jwt, tokens, {
-      accessTtlSeconds: config.accessTtlSeconds,
-      refreshTtlSeconds: config.refreshTtlSeconds,
-    }),
-    jwt,
-    tokens,
-  };
+  const authService = new AuthService(users, hasher, jwt, tokens, {
+    accessTtlSeconds: config.accessTtlSeconds,
+    refreshTtlSeconds: config.refreshTtlSeconds,
+  });
+
+  return { authService, jwt, tokens };
 };

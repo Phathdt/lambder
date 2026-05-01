@@ -17,9 +17,9 @@ describe('products-api: error-mapper & jwt-auth branch coverage', () => {
 
   async function provisionUser(email: string): Promise<{ userId: string; token: string }> {
     const password = 'StrongPass1!@#';
-    const signupRes = await auth.signup.execute({ email, password });
+    const signupRes = await auth.authService.signup({ email, password });
     if (!signupRes.ok) throw new Error('signup failed');
-    const loginRes = await auth.login.execute({ email, password });
+    const loginRes = await auth.authService.login({ email, password });
     if (!loginRes.ok) throw new Error('login failed');
     return { userId: signupRes.value.id, token: loginRes.value.accessToken };
   }
@@ -155,10 +155,10 @@ describe('products-api: error-mapper & jwt-auth branch coverage', () => {
     const password = 'StrongPass1!@#';
 
     // Use auth module to signup and login
-    const signupRes = await auth.signup.execute({ email, password });
+    const signupRes = await auth.authService.signup({ email, password });
     if (!signupRes.ok) throw new Error('signup failed');
 
-    const loginRes = await auth.login.execute({ email, password });
+    const loginRes = await auth.authService.login({ email, password });
     if (!loginRes.ok) throw new Error('login failed');
     const { refreshToken } = loginRes.value;
 
