@@ -144,6 +144,7 @@ async function deployLambda(spec: AppSpec, roleArn: string): Promise<string> {
       JWT_REFRESH_TTL: process.env.JWT_REFRESH_TTL ?? '604800',
       JWT_ISSUER: 'lambder',
       JWT_AUDIENCE: 'lambder.api',
+      CORS_ORIGINS: process.env.CORS_ORIGINS ?? 'http://localhost:3000',
       NODE_OPTIONS: '--enable-source-maps',
     },
   };

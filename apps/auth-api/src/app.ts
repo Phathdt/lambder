@@ -1,5 +1,6 @@
 import { buildAuthModule, type AuthModule } from '@lambder/auth/module';
 import { Hono } from 'hono';
+import { cors } from 'hono/cors';
 import { loadConfig } from './config';
 import { errorMapper } from './middleware/error-mapper';
 import { loginRoute } from './routes/login.route';
@@ -24,6 +25,19 @@ export const buildAuthApp = (auth?: AuthModule) => {
     );
 
   const app = new Hono();
+  // Browser FE talks to API Gateway — open CORS for local + configurable origins.
+  const allowedOrigins = (process.env.CORS_ORIGINS ?? 'http://localhost:3000')
+    .split(',')
+    .map((s) => s.trim());
+  app.use(
+    '*',
+    cors({
+      origin: (origin) => (origin && allowedOrigins.includes(origin) ? origin : allowedOrigins[0]),
+      credentials: true,
+      allowHeaders: ['authorization', 'content-type'],
+      allowMethods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+    }),
+  );
   app.onError(errorMapper);
   app.get('/health', (c) => c.json({ status: 'ok' }));
   app.route('/auth', signupRoute(module));

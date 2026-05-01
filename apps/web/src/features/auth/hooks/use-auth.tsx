@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
 import { tokenStorage } from '@/shared/api/storage';
 import { authApi, type PublicUser } from '../api/auth-api';
 
@@ -23,16 +23,18 @@ function decodeJwt<T>(token: string): T | null {
   }
 }
 
-export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<PublicUser | null>(null);
+// Build the initial user state synchronously from localStorage so route
+// guards see the correct value on the very first render (no flash of
+// unauthenticated state on reload).
+function loadInitialUser(): PublicUser | null {
+  const token = tokenStorage.getAccess();
+  if (!token) return null;
+  const claims = decodeJwt<{ sub: string }>(token);
+  return claims?.sub ? { id: claims.sub, email: '' } : null;
+}
 
-  // Hydrate from access token on mount.
-  useEffect(() => {
-    const token = tokenStorage.getAccess();
-    if (!token) return;
-    const claims = decodeJwt<{ sub: string }>(token);
-    if (claims?.sub) setUser({ id: claims.sub, email: '' });
-  }, []);
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const [user, setUser] = useState<PublicUser | null>(loadInitialUser);
 
   const login = useCallback(async (email: string, password: string) => {
     const tokens = await authApi.login({ email, password });
