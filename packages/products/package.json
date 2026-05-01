@@ -20,11 +20,11 @@
     "@lambder/contracts": "workspace:*",
     "@lambder/db": "workspace:*",
     "@lambder/shared-kernel": "workspace:*",
-    "drizzle-orm": "^0.36.0"
+    "drizzle-orm": "^0.45.2"
   },
   "devDependencies": {
     "@lambder/tsconfig": "workspace:*",
-    "typescript": "^5.6.0",
-    "vitest": "^2.1.0"
+    "typescript": "^5.9.3",
+    "vitest": "^2.1.9"
   }
 }
