@@ -60,6 +60,64 @@ services:
       redis:
         condition: service_healthy
 
+  # --- Observability stack -------------------------------------------------
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.117.0
+    container_name: lambder-otel-collector
+    ports:
+      - "127.0.0.1:4317:4317" # OTLP gRPC
+      - "127.0.0.1:4318:4318" # OTLP HTTP
+      - "127.0.0.1:8889:8889" # Prometheus exporter
+    volumes:
+      - ./infrastructure/grafana/otel-collector.yaml:/etc/otelcol-contrib/config.yaml
+    command: ["--config=/etc/otelcol-contrib/config.yaml"]
+    depends_on: [tempo, loki]
+
+  tempo:
+    image: grafana/tempo:2.6.0
+    container_name: lambder-tempo
+    command: ["-config.file=/etc/tempo.yaml"]
+    volumes:
+      - ./infrastructure/grafana/tempo.yaml:/etc/tempo.yaml
+      - tempo_data:/var/tempo
+    ports:
+      - "127.0.0.1:3200:3200"
+
+  loki:
+    image: grafana/loki:3.3.0
+    container_name: lambder-loki
+    command: ["-config.file=/etc/loki/loki.yaml"]
+    volumes:
+      - ./infrastructure/grafana/loki.yaml:/etc/loki/loki.yaml
+    ports:
+      - "127.0.0.1:3100:3100"
+
+  prometheus:
+    image: prom/prometheus:v3.0.1
+    container_name: lambder-prometheus
+    command: ["--config.file=/etc/prometheus/prometheus.yaml"]
+    volumes:
+      - ./infrastructure/grafana/prometheus.yaml:/etc/prometheus/prometheus.yaml
+    ports:
+      - "127.0.0.1:9090:9090"
+
+  grafana:
+    image: grafana/grafana:11.3.0
+    container_name: lambder-grafana
+    ports:
+      - "127.0.0.1:3000:3000"
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: "Admin"
+      GF_AUTH_DISABLE_LOGIN_FORM: "true"
+      GF_FEATURE_TOGGLES_ENABLE: "traceToLogs"
+    volumes:
+      - ./infrastructure/grafana/grafana-provisioning:/etc/grafana/provisioning
+      - grafana_data:/var/lib/grafana
+    depends_on: [tempo, loki, prometheus]
+
 volumes:
   pg_data:
   redis_data:
+  tempo_data:
+  grafana_data:

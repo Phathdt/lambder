@@ -1,4 +1,5 @@
 import { SQSClient, SendMessageCommand } from '@aws-sdk/client-sqs';
+import { injectTraceContextIntoSqsAttrs } from '@lambder/observability';
 import type {
   EmailEnqueuer,
   WelcomeEmailJob,
@@ -27,10 +28,14 @@ export class SqsEmailEnqueuer implements EmailEnqueuer {
 
   async enqueueWelcome(input: WelcomeEmailJobInput): Promise<void> {
     const body: WelcomeEmailJob = { ...input, enqueuedAt: new Date().toISOString() };
+    // Carry the active span context across the queue hop so the worker can
+    // resume the same distributed trace.
+    const MessageAttributes = injectTraceContextIntoSqsAttrs();
     await this.client.send(
       new SendMessageCommand({
         QueueUrl: this.queueUrl,
         MessageBody: JSON.stringify(body),
+        MessageAttributes,
       }),
     );
   }

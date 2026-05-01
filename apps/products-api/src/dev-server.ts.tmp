@@ -3,10 +3,10 @@ import { resolve } from 'node:path';
 config({ path: resolve(process.cwd(), '../../.env') });
 config();
 
+// Init OTel BEFORE importing the instrumented app module.
 const { initOTelSdk } = await import('@lambder/observability');
 initOTelSdk({ serviceName: 'products-api' });
 
-const { serve } = await import('@hono/node-server');
 const { buildProductsApp } = await import('./app');
 
 const port = Number.parseInt(process.env.PORT ?? '3002', 10);

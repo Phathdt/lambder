@@ -236,6 +236,10 @@ function envForApp(spec: AppSpec, queues?: { mainUrl: string }): Record<string, 
     NODE_ENV: 'production',
     AWS_ENDPOINT_URL: 'http://localstack:4566',
     AWS_REGION: REGION,
+    // OTel collector reachable from Lambda containers via host gateway.
+    OTEL_EXPORTER_OTLP_ENDPOINT:
+      process.env.OTEL_EXPORTER_OTLP_ENDPOINT ?? 'http://host.docker.internal:4318',
+    OTEL_SERVICE_NAME: spec.fnName,
   };
   if (spec.name === 'email-worker') {
     return {

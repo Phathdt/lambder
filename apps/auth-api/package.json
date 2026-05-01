@@ -17,6 +17,7 @@
     "@lambder/contracts": "workspace:*",
     "@lambder/db": "workspace:*",
     "@lambder/email": "workspace:^",
+    "@lambder/observability": "workspace:^",
     "@lambder/shared-kernel": "workspace:*",
     "dotenv": "^17.4.2",
     "drizzle-orm": "^0.45.2",

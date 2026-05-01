@@ -1,0 +1,5 @@
+{
+  "extends": "@lambder/tsconfig/lib.json",
+  "include": ["src/**/*"],
+  "compilerOptions": { "rootDir": "src", "outDir": "../../dist/packages/observability" }
+}
