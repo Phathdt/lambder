@@ -7,6 +7,7 @@
     "test:headed": "HEADLESS=false cucumber-js --config .cucumber.cjs",
     "test:auth": "cucumber-js --config .cucumber.cjs --tags @auth",
     "test:products": "cucumber-js --config .cucumber.cjs --tags @products",
+    "test:full": "concurrently --kill-others --success first --names web,e2e -c blue,green 'pnpm --filter web dev' 'wait-on http://localhost:3000 && cucumber-js --config .cucumber.cjs'",
     "install:browsers": "playwright install chromium",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf test-results"
@@ -17,10 +18,12 @@
     "@lambder/tsconfig": "workspace:*",
     "@playwright/test": "^1.49.0",
     "@types/node": "^22.0.0",
+    "concurrently": "^9.0.0",
     "dotenv": "^17.4.2",
     "playwright": "^1.49.0",
     "ts-node": "^10.9.0",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.6.0"
+    "typescript": "^5.6.0",
+    "wait-on": "^8.0.0"
   }
 }
