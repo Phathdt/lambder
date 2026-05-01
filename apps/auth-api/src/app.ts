@@ -1,14 +1,19 @@
 import { buildAuthModule, type AuthModule } from '@lambder/auth/module';
+import { createLogger, type Logger } from '@lambder/shared-kernel';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { loadConfig } from './config';
 import { errorMapper } from './middleware/error-mapper';
+import { requestLogger } from './middleware/request-logger';
 import { loginRoute } from './routes/login.route';
 import { logoutRoute } from './routes/logout.route';
 import { refreshRoute } from './routes/refresh.route';
 import { signupRoute } from './routes/signup.route';
 
-export const buildAuthApp = (auth?: AuthModule) => {
+export const buildAuthApp = (auth?: AuthModule, logger?: Logger) => {
+  const log =
+    logger ??
+    createLogger({ service: 'auth-api', pretty: process.env.NODE_ENV !== 'production' });
   /* c8 ignore next 14 */
   const module =
     auth ??
@@ -39,6 +44,7 @@ export const buildAuthApp = (auth?: AuthModule) => {
       allowMethods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
     }),
   );
+  app.use('*', requestLogger(log));
   app.onError(errorMapper);
   app.get('/health', (c) => c.json({ status: 'ok' }));
   app.route('/auth', signupRoute(module));

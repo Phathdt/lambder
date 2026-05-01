@@ -1,5 +1,9 @@
 import { buildAuthModule } from '@lambder/auth/module';
+import { createLogger } from '@lambder/shared-kernel';
 import { buildAuthApp } from '../app';
+
+// Silent logger keeps test output clean.
+const silentLogger = createLogger({ service: 'auth-api-test', level: 'silent' });
 
 export interface TestAppEnv {
   databaseUrl: string;
@@ -23,5 +27,5 @@ export const buildTestAuthApp = (env: TestAppEnv) => {
     issuer: env.issuer ?? 'lambder-test',
     audience: env.audience ?? 'lambder-test.api',
   });
-  return buildAuthApp(auth);
+  return buildAuthApp(auth, silentLogger);
 };

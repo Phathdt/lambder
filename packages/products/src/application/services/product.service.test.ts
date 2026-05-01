@@ -134,7 +134,8 @@ describe('ProductService — update', () => {
     const result = await svc.update({
       actorId: 'u1',
       id: p.id,
-      patch: { description: null },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      patch: { description: null } as any,
     });
     expect(isOk(result)).toBe(true);
     if (isOk(result)) expect(result.value.description).toBeNull();

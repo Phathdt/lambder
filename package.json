@@ -29,6 +29,8 @@
     "compose:up": "docker compose up -d",
     "compose:down": "docker compose down",
     "compose:logs": "docker compose logs -f",
+    "logs:auth": "bash scripts/lambda-logs.sh auth-api -f",
+    "logs:products": "bash scripts/lambda-logs.sh products-api -f",
     "db:generate": "pnpm --filter @lambder/db db:generate",
     "db:migrate": "pnpm --filter @lambder/db db:migrate",
     "db:studio": "pnpm --filter @lambder/db db:studio",

@@ -63,6 +63,7 @@ describe('Argon2Hasher (scrypt-backed)', () => {
     // by passing buffers of mismatched lengths through to the comparison
     // This is defensive code that catches any error from scrypt in verify
     const [, saltHex, expectedHex] = digest.split('$');
+    if (!expectedHex) throw new Error('digest format unexpected');
 
     // Create a slightly shorter expected hash to potentially cause issues
     const parts = expectedHex.split('');
