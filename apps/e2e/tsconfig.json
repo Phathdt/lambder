@@ -1,6 +1,14 @@
 {
-  "extends": "@lambder/tsconfig/app.json",
   "compilerOptions": {
+    "target": "ES2022",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "resolveJsonModule": true,
+    "noEmit": true,
     "types": ["node"],
     "baseUrl": ".",
     "paths": {
@@ -8,5 +16,5 @@
     }
   },
   "include": ["**/*.ts"],
-  "exclude": ["node_modules", "test-results", "playwright-report"]
+  "exclude": ["node_modules", "test-results"]
 }
