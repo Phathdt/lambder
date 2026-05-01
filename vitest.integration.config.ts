@@ -48,11 +48,18 @@ export default defineConfig({
       exclude: [
         '**/*.d.ts',
         '**/index.ts',
+        '**/*.test.ts',
+        '**/*.test.tsx',
         '**/*.integration.spec.ts',
         '**/__test-helpers__/**',
+        '**/__test-fakes__/**',
         '**/migrations/**',
         '**/dev-server.ts',
         '**/main.ts',
+        // products-api app entry uses inlined env reads; the test path uses
+        // a helper that bypasses it. auth-api keeps coverage because its
+        // helper does call buildAuthApp directly.
+        'apps/products-api/src/app.ts',
       ],
     },
   },

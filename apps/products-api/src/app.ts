@@ -1,3 +1,6 @@
+// Production wiring entry — Lambda handler imports buildProductsApp(). Tests
+// use a separate inlined helper to inject mock infra, so this file is
+// excluded from integration coverage in vitest.integration.config.ts.
 import { getRedis } from '@lambder/cache';
 import { JoseJwtService, RedisTokenStore } from '@lambder/auth';
 import { buildProductsModule } from '@lambder/products/module';
@@ -7,7 +10,6 @@ import { loadConfig } from './config';
 import { errorMapper } from './middleware/error-mapper';
 import { productsRoute } from './routes/products.route';
 
-/* c8 ignore start */
 export const buildProductsApp = () => {
   const env = loadConfig();
   const products = buildProductsModule({ databaseUrl: env.DATABASE_URL });
@@ -36,5 +38,4 @@ export const buildProductsApp = () => {
   app.get('/health', (c) => c.json({ status: 'ok' }));
   app.route('/products', productsRoute({ products, jwt, tokens }));
   return app;
-}
-/* c8 ignore stop */
+};
