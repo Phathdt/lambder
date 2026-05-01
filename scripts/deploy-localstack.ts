@@ -454,7 +454,7 @@ async function main() {
 
   // Surface queue URL for `awslocal sqs receive-message` debugging.
   const workerEnv = resolve(process.cwd(), 'apps/email-worker/.env.local');
-  writeFileSync(workerEnv, `EMAIL_QUEUE_URL=${queues.main.url}\nEMAIL_DLQ_URL=${queues.dlq.url}\n`);
+  writeFileSync(workerEnv, `EMAIL_QUEUE_URL=${queues.main.url}\n`);
 
   console.log('\n✓ Deploy complete');
   console.log(`   gateway:  ${baseUrl}`);
