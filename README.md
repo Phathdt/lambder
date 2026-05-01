@@ -58,7 +58,7 @@ pnpm deploy:local                 # creates 3 Lambdas, REST API gateway, SQS+DLQ
                                   # → writes API Gateway URL into apps/web/.env.local
                                   # → writes EMAIL_QUEUE_URL into apps/email-worker/.env.local
 
-pnpm --filter web dev             # opens http://localhost:3000
+pnpm --filter web dev             # opens http://localhost:5173
 ```
 
 The frontend hits the LocalStack API Gateway URL (auto-set by `deploy:local`).

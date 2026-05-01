@@ -255,7 +255,7 @@ describe('auth-api: error-mapper & jwt-auth branch coverage', () => {
   test('app: CORS headers are set correctly', async () => {
     const res = await app.request('/health', {
       headers: {
-        origin: 'http://localhost:3000',
+        origin: 'http://localhost:5173',
       },
     });
     expect(res.status).toBe(200);

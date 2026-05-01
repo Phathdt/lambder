@@ -38,7 +38,7 @@ export const buildAuthApp = (auth?: AuthModule, logger?: Logger) => {
 
   const app = new Hono();
   // Browser FE talks to API Gateway — open CORS for local + configurable origins.
-  const allowedOrigins = (process.env.CORS_ORIGINS ?? 'http://localhost:3000')
+  const allowedOrigins = (process.env.CORS_ORIGINS ?? 'http://localhost:5173')
     .split(',')
     .map((s) => s.trim());
   app.use(

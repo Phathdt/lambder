@@ -7,7 +7,7 @@
     "test:headed": "HEADLESS=false cucumber-js --config .cucumber.cjs",
     "test:auth": "cucumber-js --config .cucumber.cjs --tags @auth",
     "test:products": "cucumber-js --config .cucumber.cjs --tags @products",
-    "test:full": "concurrently --kill-others --success first --names web,e2e -c blue,green 'pnpm --filter web dev' 'wait-on http://localhost:3000 && cucumber-js --config .cucumber.cjs'",
+    "test:full": "concurrently --kill-others --success first --names web,e2e -c blue,green 'pnpm --filter web dev' 'wait-on http://localhost:5173 && cucumber-js --config .cucumber.cjs'",
     "install:browsers": "playwright install chromium",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf test-results"

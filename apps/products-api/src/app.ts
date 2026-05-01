@@ -28,7 +28,7 @@ export const buildProductsApp = () => {
   });
 
   const app = new Hono();
-  const allowedOrigins = (process.env.CORS_ORIGINS ?? 'http://localhost:3000')
+  const allowedOrigins = (process.env.CORS_ORIGINS ?? 'http://localhost:5173')
     .split(',')
     .map((s) => s.trim());
   app.use(

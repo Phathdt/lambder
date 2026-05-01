@@ -254,7 +254,7 @@ function envForApp(spec: AppSpec, queues?: { mainUrl: string }): Record<string, 
     JWT_REFRESH_TTL: process.env.JWT_REFRESH_TTL ?? '604800',
     JWT_ISSUER: 'lambder',
     JWT_AUDIENCE: 'lambder.api',
-    CORS_ORIGINS: process.env.CORS_ORIGINS ?? 'http://localhost:3000',
+    CORS_ORIGINS: process.env.CORS_ORIGINS ?? 'http://localhost:5173',
   };
   if (spec.name === 'auth-api' && queues) httpEnv.EMAIL_QUEUE_URL = queues.mainUrl;
   return httpEnv;

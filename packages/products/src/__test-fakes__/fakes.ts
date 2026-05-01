@@ -17,7 +17,7 @@ export const createFakeProductRepository = (): FakeProductRepository => {
       return items.get(id) ?? null;
     },
     async list({ limit, cursor }): Promise<ProductPage> {
-      const all = [...items.values()].sort((a, b) => a.id.localeCompare(b.id));
+      const all = [...items.values()].toSorted((a, b) => a.id.localeCompare(b.id));
       const start = cursor ? all.findIndex((p) => p.id > cursor) : 0;
       const slice = all.slice(start === -1 ? all.length : start, (start === -1 ? all.length : start) + limit + 1);
       const hasMore = slice.length > limit;
