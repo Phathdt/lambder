@@ -27,7 +27,7 @@ describe('apiClient', () => {
         headers: axios.AxiosHeaders.from({}),
         method: 'get',
         url: '/products',
-      } as any;
+      } as never;
 
       const interceptor = apiClient.interceptors.request.handlers[0];
       const result = interceptor.fulfilled(config);
@@ -42,7 +42,7 @@ describe('apiClient', () => {
         headers: axios.AxiosHeaders.from({}),
         method: 'get',
         url: '/products',
-      } as any;
+      } as never;
 
       const interceptor = apiClient.interceptors.request.handlers[0];
       const result = interceptor.fulfilled(config);
@@ -62,8 +62,8 @@ describe('apiClient', () => {
           headers: axios.AxiosHeaders.from({}),
           method: 'get',
           url: '/products',
-        } as any,
-      } as any);
+        } as never,
+      } as never);
 
       const interceptor = apiClient.interceptors.response.handlers[0];
       await expect(interceptor.rejected(error)).rejects.toThrow();
@@ -85,7 +85,7 @@ describe('apiClient', () => {
           headers: axios.AxiosHeaders.from({}),
           method: 'get',
           url: '/products',
-        } as any,
+        } as never,
         undefined,
         {
           status: 401,
@@ -97,8 +97,8 @@ describe('apiClient', () => {
             method: 'get',
             url: '/products',
             _retried: true,
-          } as any,
-        } as any,
+          } as never,
+        } as never,
       );
 
       const interceptor = apiClient.interceptors.response.handlers[0];
@@ -113,7 +113,7 @@ describe('apiClient', () => {
           headers: axios.AxiosHeaders.from({}),
           method: 'post',
           url: '/auth/refresh',
-        } as any,
+        } as never,
         undefined,
         {
           status: 401,
@@ -124,8 +124,8 @@ describe('apiClient', () => {
             headers: axios.AxiosHeaders.from({}),
             method: 'post',
             url: '/auth/refresh',
-          } as any,
-        } as any,
+          } as never,
+        } as never,
       );
 
       const interceptor = apiClient.interceptors.response.handlers[0];
@@ -145,7 +145,7 @@ describe('apiClient', () => {
           headers: axios.AxiosHeaders.from({}),
           method: 'get',
           url: '/products',
-        } as any,
+        } as never,
         undefined,
         {
           status: 401,
@@ -156,8 +156,8 @@ describe('apiClient', () => {
             headers: axios.AxiosHeaders.from({}),
             method: 'get',
             url: '/products',
-          } as any,
-        } as any,
+          } as never,
+        } as never,
       );
 
       const interceptor = apiClient.interceptors.response.handlers[0];
@@ -181,7 +181,7 @@ describe('apiClient', () => {
         status: 200,
         statusText: 'OK',
         headers: {},
-        config: {} as any,
+        config: {} as never,
       });
 
       const originalConfig = {
@@ -190,7 +190,7 @@ describe('apiClient', () => {
         }),
         method: 'get',
         url: '/products',
-      } as any;
+      } as never;
 
       const error = new AxiosError('Unauthorized', 'ERR_BAD_REQUEST', originalConfig, undefined, {
         status: 401,
@@ -198,10 +198,10 @@ describe('apiClient', () => {
         data: {},
         headers: {},
         config: originalConfig,
-      } as any);
+      } as never);
 
       const interceptor = apiClient.interceptors.response.handlers[0];
-      const result = await interceptor.rejected(error);
+      const _result = await interceptor.rejected(error);
 
       expect(refreshSpy).toHaveBeenCalled();
       expect(vi.mocked(tokenStorage.setTokens)).toHaveBeenCalledWith(
@@ -225,7 +225,7 @@ describe('apiClient', () => {
         headers: axios.AxiosHeaders.from({}),
         method: 'get',
         url: '/products',
-      } as any;
+      } as never;
 
       const error = new AxiosError('Unauthorized', 'ERR_BAD_REQUEST', originalConfig, undefined, {
         status: 401,
@@ -233,7 +233,7 @@ describe('apiClient', () => {
         data: {},
         headers: {},
         config: originalConfig,
-      } as any);
+      } as never);
 
       const interceptor = apiClient.interceptors.response.handlers[0];
       await expect(interceptor.rejected(error)).rejects.toThrow();
@@ -250,7 +250,7 @@ describe('apiClient', () => {
         status: 200,
         statusText: 'OK',
         headers: {},
-        config: {} as any,
+        config: {} as never,
       });
 
       const result = await apiClient.get('/products');
@@ -265,7 +265,7 @@ describe('apiClient', () => {
         status: 201,
         statusText: 'Created',
         headers: {},
-        config: {} as any,
+        config: {} as never,
       });
 
       const result = await apiClient.post('/products', { name: 'Widget' });
@@ -280,7 +280,7 @@ describe('apiClient', () => {
         status: 200,
         statusText: 'OK',
         headers: {},
-        config: {} as any,
+        config: {} as never,
       });
 
       const result = await apiClient.patch('/products/p1', { name: 'Updated Widget' });
@@ -295,7 +295,7 @@ describe('apiClient', () => {
         status: 204,
         statusText: 'No Content',
         headers: {},
-        config: {} as any,
+        config: {} as never,
       });
 
       await apiClient.delete('/products/p1');

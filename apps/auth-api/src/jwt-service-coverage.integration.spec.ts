@@ -37,7 +37,7 @@ describe('jose-jwt.service integration: issuer/audience verification', () => {
 
     const email1 = `issuer-test1+${Date.now()}@example.com`;
     const password = 'StrongPass1!@#';
-    const signup = await app1.request('/auth/signup', {
+    const _signup = await app1.request('/auth/signup', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ email: email1, password }),
@@ -261,7 +261,7 @@ describe('jose-jwt.service integration: issuer/audience verification', () => {
       body: JSON.stringify({ email, password }),
     });
     expect(login.status).toBe(200);
-    const { accessToken, refreshToken } = await login.json();
+    const { accessToken } = (await login.json()) as { accessToken: string };
 
     // Test access token
     const logout = await app.request('/auth/logout', {

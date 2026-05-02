@@ -1,11 +1,9 @@
 import { defineConfig } from 'rolldown';
-import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT_DIST = resolve(HERE, '../../dist/apps/auth-api');
-const pkg = JSON.parse(readFileSync(resolve(HERE, 'package.json'), 'utf8'));
 // Inline workspace @lambder/* packages so the Lambda zip ships compiled JS only.
 // Externalize EVERYTHING else (third-party + transitive deps via @lambder/*).
 const isWorkspace = (id) => id.startsWith('@lambder/');

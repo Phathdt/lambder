@@ -33,7 +33,7 @@ const makeEvent = (records: { messageId: string; body: string }[]): SQSEvent => 
   })),
 });
 
-const validJob = (id = 'm1') =>
+const validJob = (_id = 'm1') =>
   JSON.stringify({
     userId: '00000000-0000-4000-8000-000000000000',
     email: 'a@b.com',

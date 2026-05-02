@@ -227,7 +227,7 @@ describe('extractApiError', () => {
     });
 
     test('handles object with circular reference gracefully', () => {
-      const error: any = {
+      const error = {
         response: {
           data: {
             error: {

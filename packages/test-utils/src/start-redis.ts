@@ -13,13 +13,15 @@ export async function startRedis(): Promise<StartedRedis> {
   const url = `redis://${container.getHost()}:${container.getMappedPort(6379)}`;
   process.env.REDIS_URL = url;
   // biome-ignore lint/suspicious/noExplicitAny: globalThis access
-  delete (globalThis as any)._redis;
+  delete (globalThis as Record<string, unknown>)._redis;
 
   return {
     url,
     async stop() {
       // biome-ignore lint/suspicious/noExplicitAny: globalThis access
-      const r = (globalThis as any)._redis;
+      const r = (globalThis as Record<string, unknown>)._redis as
+        | { quit(): Promise<unknown>; disconnect(): void }
+        | undefined;
       if (r) {
         try {
           await r.quit();
@@ -27,7 +29,7 @@ export async function startRedis(): Promise<StartedRedis> {
           /* already closed */
         }
         // biome-ignore lint/suspicious/noExplicitAny: globalThis access
-        delete (globalThis as any)._redis;
+        delete (globalThis as Record<string, unknown>)._redis;
       }
       await container.stop();
     },

@@ -23,7 +23,7 @@ export async function startPostgres(): Promise<StartedPostgres> {
   // The pg Pool is memoized on globalThis to survive Lambda warm starts.
   // Clear it here so a new container gets a fresh pool.
   // biome-ignore lint/suspicious/noExplicitAny: globalThis access
-  delete (globalThis as any)._pgPool;
+  delete (globalThis as Record<string, unknown>)._pgPool;
 
   // Apply Drizzle migrations against the freshly started container.
   execSync('pnpm --filter @lambder/db exec tsx scripts/run-migrations.ts', {
@@ -36,7 +36,9 @@ export async function startPostgres(): Promise<StartedPostgres> {
     url,
     async stop() {
       // biome-ignore lint/suspicious/noExplicitAny: globalThis access
-      const pool = (globalThis as any)._pgPool;
+      const pool = (globalThis as Record<string, unknown>)._pgPool as
+        | { end(): Promise<void> }
+        | undefined;
       if (pool) {
         try {
           await pool.end();
@@ -44,7 +46,7 @@ export async function startPostgres(): Promise<StartedPostgres> {
           /* already closed */
         }
         // biome-ignore lint/suspicious/noExplicitAny: globalThis access
-        delete (globalThis as any)._pgPool;
+        delete (globalThis as Record<string, unknown>)._pgPool;
       }
       await container.stop();
     },

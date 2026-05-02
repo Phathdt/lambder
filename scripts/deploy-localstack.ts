@@ -321,30 +321,6 @@ async function ensureFreshRestApi(): Promise<{ apiId: string; rootResourceId: st
   return { apiId, rootResourceId: root!.id! };
 }
 
-async function createProxyResource(
-  apiId: string,
-  parentId: string,
-  pathPart: string,
-): Promise<string> {
-  // Create /<pathPart>
-  const base = await apigw.send(
-    new CreateResourceCommand({
-      restApiId: apiId,
-      parentId,
-      pathPart,
-    }),
-  );
-  // Create /<pathPart>/{proxy+}
-  const proxy = await apigw.send(
-    new CreateResourceCommand({
-      restApiId: apiId,
-      parentId: base.id!,
-      pathPart: '{proxy+}',
-    }),
-  );
-  return proxy.id!;
-}
-
 async function wireMethod(
   apiId: string,
   resourceId: string,
